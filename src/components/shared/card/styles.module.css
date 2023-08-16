@@ -1,0 +1,9 @@
+.cardTitle {
+    width: 16vw;
+}
+
+@media screen and (max-width: 768px) {
+    .cardTitle {
+        width: 80vw;
+    }
+}

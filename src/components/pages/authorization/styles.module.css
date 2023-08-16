@@ -1,0 +1,114 @@
+body {
+  background-color: #f0e6d7;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  width: 65vw;
+  margin-top: 50px;
+}
+
+.toggleBtn {
+  background-color: #6a7775;
+  color: white;
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 65vw;
+  margin-top: 50px;
+}
+
+.title {
+  font-size: 7vh;
+  width: 200px;
+  padding-bottom: 40px;
+}
+
+.subtitle {
+  font-size: 2vh;
+  width: 25vw;
+}
+
+.leavesImage {
+  width: 6vh;
+  height: 6vh;
+}
+
+.backgroundImage {
+  position: absolute;
+  top: 25vh;
+  left: 25vw;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.loginImage {
+  width: 55vw;
+  border-radius: 20px;
+}
+
+.formBox {
+  border: 1px solid white;
+  border-radius: 10px;
+  background-color: white;
+  width: 500px;
+  height: fit-content;
+}
+
+.submitBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabContent {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+@media only screen and (max-width: 768px) {
+  .nav {
+    width: 100vw;
+  }
+
+  .content {
+    width: 90vw;
+    margin-top: 30px;
+  }
+
+  .title {
+    padding-bottom: 20px;
+  }
+
+  .formBox {
+    width: 400px;
+    padding: 0;
+  }
+
+  .backgroundImage {
+    top: 30vh;
+  }
+
+  .loginImage {
+    overflow: hidden;
+    width: 70vw;
+  }
+
+  .subtitle {
+    width: 65vw;
+  }
+
+  .ant-form-item.css-dev-only-do-not-override-fpg3f5 {
+    
+    margin-bottom: 8px;
+  }
+}
