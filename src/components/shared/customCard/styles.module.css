@@ -1,0 +1,13 @@
+.cardTitle {
+    width: 16vw;
+}
+
+.badgeStyle {
+    margin: 0 2px;
+}
+
+@media screen and (max-width: 768px) {
+    .cardTitle {
+        width: 80vw;
+    }
+}

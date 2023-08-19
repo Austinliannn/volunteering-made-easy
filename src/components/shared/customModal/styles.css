@@ -1,0 +1,33 @@
+.badgeStyle {
+  margin: 0 2px;
+}
+
+.ant-modal {
+  .ant-modal-header {
+    margin: 0;
+  }
+
+  .ant-modal-title {
+    text-align: center;
+    text-decoration: underline;
+    font-size: 20px;
+  }
+  .ant-modal-footer {
+    text-align: center;
+  }
+}
+.imgStyle {
+  height: 30vh;
+  border-radius: 10px;
+}
+
+.imgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.desContainer{
+    padding-bottom: 10px;
+}

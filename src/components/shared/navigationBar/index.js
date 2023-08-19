@@ -2,9 +2,12 @@ import React from "react";
 import styles from "./styles.module.css";
 import leavesImage from "../../../assets/leaves.jpg";
 import { MenuOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { useNavigate } from "react-router-dom";
 
-export const NavigationBar = () => {
+export const NavigationBar = ({ home, logout, profile, tracker }) => {
   const [isNavListVisible, setNavListVisible] = React.useState(false);
+  const navigate = useNavigate();
 
   const toggleNavList = () => {
     setNavListVisible(!isNavListVisible);
@@ -34,13 +37,37 @@ export const NavigationBar = () => {
           }`}
         >
           <div className={styles.grouping}>
-            <div className={styles.content}>Log Out</div>
-            <div className={styles.content}>Home</div>
-            <div className={styles.content}>Profile</div>
-            <div className={styles.content}>Tracker</div>
+            <Button
+              className={styles.content}
+              type="text"
+              onClick={() => navigate(logout)}
+            >
+              Log Out
+            </Button>
+            <Button
+              className={styles.content}
+              type="text"
+              onClick={() => navigate(home)}
+            >
+              Home
+            </Button>
+            <Button
+              className={styles.content}
+              type="text"
+              onClick={() => navigate(profile)}
+            >
+              Profile
+            </Button>
+            <Button
+              className={styles.content}
+              type="text"
+              onClick={() => navigate(tracker)}
+            >
+              Tracker
+            </Button>
           </div>
         </div>
       </div>
     </>
   );
-}
+};

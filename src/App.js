@@ -1,17 +1,20 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import OrganizationHome from "./components/pages/home/organization";
-import VolunteerHome from "./components/pages/home/volunteer";
 import Login from "./components/pages/authorization";
+import VolunteerHome from "./components/pages/home/volunteer";
+import VolunteerProfile from "./components/pages/profile";
+
+import OrganizationHome from "./components/pages/home/organization";
 
 function App() {
   return (
     <div className="App">
-     <Router>
+      <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/organization" element={<OrganizationHome />} />
-        <Route path="/volunteer" element={<VolunteerHome />} />
+          <Route path="/volunteer" element={<VolunteerHome />} />
+          <Route path="/profile" element={<VolunteerProfile />} />
         </Routes>
       </Router>
     </div>

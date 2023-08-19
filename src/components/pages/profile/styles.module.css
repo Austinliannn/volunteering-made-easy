@@ -1,0 +1,122 @@
+.container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.editContainer {
+  display: flex;
+  justify-content: flex-end;
+  width: 70vw;
+  margin-top: 2vh;
+  margin-right: 3vw;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 70vw;
+  margin: 2vh 0 4vh 0;
+  flex-wrap: wrap;
+}
+
+.profContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.eventContainer {
+  display: flex;
+}
+
+.profileImage {
+  padding: 5px 5px;
+  width: 10vw;
+  border-radius: 100px;
+  border: 2px solid black;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.traitsContainer {
+  background-color: #6a7775;
+  border-radius: 10px;
+  margin-top: 20px;
+  width: 30vw;
+  color: black;
+  padding-left: 2vw;
+}
+.eventContainer {
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+  background-color: #6a7775;
+  border-radius: 10px;
+  padding: 0 2vw;
+}
+
+.badgesContainer {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 5px 0;
+}
+
+.badgeStyle {
+  margin: 5px 5px;
+  margin-left: 0px;
+}
+
+h1 {
+  margin: 8px 0;
+}
+
+h2 {
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.tabContent {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.applyBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .profileImage {
+    width: 25vw;
+  }
+
+  .content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+  }
+
+  .traitsContainer {
+    width: 80vw;
+  }
+
+  .eventContainer {
+    width: 80vw;
+    margin-top: 20px;
+  }
+
+  .editContainer {
+    width: 80vw;
+  }
+}
