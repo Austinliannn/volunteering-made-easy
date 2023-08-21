@@ -99,19 +99,26 @@ function VolunteerHome() {
 
   return (
     <>
-      <NavigationBar home="/volunteer" logout="/login" tracker="/tracker" profile="/profile"/>
+      <NavigationBar
+        home="/volunteer"
+        logout="/"
+        tab1="/tracker"
+        tab1Name="Tracker"
+        tab2="/profile"
+        tab2Name="Profile"
+      />
 
       <div className={styles.container}>
         <div className={styles.filter}>
           {filters.map((data, index) => (
-             <DropDownSelect
-             key={index}
-             title={data.title}
-             placeholder={data.placeholder}
-             options={data.options}
-             onChange={data.onChange}
-             mode={data.mode}
-           />
+            <DropDownSelect
+              key={index}
+              title={data.title}
+              placeholder={data.placeholder}
+              options={data.options}
+              onChange={data.onChange}
+              mode={data.mode}
+            />
           ))}
         </div>
       </div>

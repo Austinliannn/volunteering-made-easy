@@ -1,9 +1,9 @@
 import React from "react";
-import styles from "../styles.module.css";
+import "./styles.css";
 import { Select, Table, Button } from "antd";
-import { NavigationBar } from "../../../shared/navigationBar";
+import { NavigationBar } from "../../shared/navigationBar";
 
-function OrganizationHome() {
+function ApplicantTracker() {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
@@ -15,9 +15,19 @@ function OrganizationHome() {
       key: "name",
     },
     {
-      title: "Event",
-      dataIndex: "event",
-      key: "event",
+      title: "Website",
+      dataIndex: "website",
+      key: "website",
+    },
+    {
+      title: "Skills",
+      dataIndex: "skills",
+      key: "skills",
+    },
+    {
+      title: "Interests",
+      dataIndex: "interests",
+      key: "interests",
     },
     {
       title: "Email",
@@ -30,11 +40,6 @@ function OrganizationHome() {
       key: "contact",
     },
     {
-      title: "Link",
-      dataIndex: "link",
-      key: "link",
-    },
-    {
       title: "",
       dataIndex: "actions",
       key: "actions",
@@ -44,18 +49,30 @@ function OrganizationHome() {
   const dataSource = [
     {
       key: "1",
-      name: "Josh",
-      event: "Help the Dogs",
-      email: "Josh@testmail.com",
+      name: "JohnDoe",
+      website: "link",
+      skills: ["Web Development", "JS"],
+      interests: ["JavaScript", "BasketBall"],
+      email: "JohnDoe@testmail.com",
       contact: "98765432",
-      link: "link",
       actions: (
-        <Button type="primary" danger onClick={() => ""}>
-          Remove
-        </Button>
+        <div className='actionsBtn'>
+          <Button type="primary" className="addBtn" onClick={() => ""}>
+            +
+          </Button>
+          <Button type="primary" danger onClick={() => ""}>
+            -
+          </Button>
+        </div>
       ),
     },
   ];
+
+  const formattedDataSource = dataSource.map((item) => ({
+    ...item,
+    skills: item.skills.join(", "),
+    interests: item.interests.join(", "),
+  }));
 
   return (
     <>
@@ -68,8 +85,8 @@ function OrganizationHome() {
         tab2Name="Event"
       />
 
-      <div className={styles.container}>
-        <div className={styles.topRow}>
+      <div className="container">
+        <div className="topRow">
           <div>
             Event:
             <Select
@@ -81,18 +98,22 @@ function OrganizationHome() {
                 { value: "Yiminghe", label: "yiminghe" },
                 { value: "disabled", label: "Disabled", disabled: true },
               ]}
-              className={styles.eventSelector}
+              className="eventSelector"
             />
           </div>
         </div>
 
-        <div className={styles.tableContainer}>
-          <h2 className="headerText">Volunteer List:</h2>
-          <Table className="customTable" dataSource={dataSource} columns={columns} />
+        <div className="tableContainer">
+          <h2 className="headerText">Applicant List:</h2>
+          <Table
+            className="customTable"
+            dataSource={formattedDataSource}
+            columns={columns}
+          />
         </div>
       </div>
     </>
   );
 }
 
-export default OrganizationHome;
+export default ApplicantTracker;

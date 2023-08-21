@@ -1,0 +1,68 @@
+.container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+}
+
+.content {
+  width: 80vw;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.currentList {
+  background-color: #6a7775;
+  padding: 10px;
+  border-radius: 10px;
+  width: 70%;
+}
+
+.completedList {
+  background-color: #6a7775;
+  padding: 10px;
+  border-radius: 10px;
+  width: 25%;
+}
+
+.tabContent {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.applyBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 820px) {
+  .content {
+    width: 100vw;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .currentList {
+    padding: 10px;
+    width: 90%;
+    overflow: auto;
+    margin-bottom: 20px;
+  }
+
+  .completedList {
+    padding: 10px;
+    width: 90%;
+    overflow: auto;
+  }
+}

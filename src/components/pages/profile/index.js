@@ -47,13 +47,15 @@ function VolunteerProfile() {
     <>
       <NavigationBar
         home="/volunteer"
-        logout="/login"
-        tracker="/tracker"
-        profile="/profile"
+        logout="/"
+        tab1="/tracker"
+        tab1Name="Tracker"
+        tab2="/profile"
+        tab2Name="Profile"
       />
       <div className={styles.container}>
         <div className={styles.editContainer}>
-          <Button className={styles.editBtn} type="primary" onClick={() => showModal(data)}>
+          <Button className={styles.editBtn} type="primary" onClick={() => showModal()}>
             Edit Profile
           </Button>
         </div>
@@ -76,7 +78,7 @@ function VolunteerProfile() {
             </div>
 
             <div className={styles.traitsContainer}>
-              <h2>Skills</h2>
+              <h2>Skills: </h2>
               <div className={styles.badgesContainer}>
                 {data.skills.map(({ text, color }, index) => (
                   <Badge
@@ -90,7 +92,7 @@ function VolunteerProfile() {
             </div>
 
             <div className={styles.traitsContainer}>
-              <h2>Interests</h2>
+              <h2>Interests: </h2>
               <div className={styles.badgesContainer}>
                 {data.interests.map(({ text, color }, index) => (
                   <Badge
@@ -104,7 +106,7 @@ function VolunteerProfile() {
             </div>
 
             <div className={styles.traitsContainer}>
-              <h2>Locations</h2>
+              <h2>Locations: </h2>
               <div className={styles.badgesContainer}>
                 {data.locations.map(({ text, color }, index) => (
                   <Badge

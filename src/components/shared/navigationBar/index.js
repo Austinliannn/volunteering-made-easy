@@ -5,7 +5,14 @@ import { MenuOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 
-export const NavigationBar = ({ home, logout, profile, tracker }) => {
+export const NavigationBar = ({
+  home,
+  logout,
+  tab1,
+  tab1Name,
+  tab2,
+  tab2Name,
+}) => {
   const [isNavListVisible, setNavListVisible] = React.useState(false);
   const navigate = useNavigate();
 
@@ -16,6 +23,7 @@ export const NavigationBar = ({ home, logout, profile, tracker }) => {
   return (
     <>
       <div className={styles.navBar}>
+        <div className={styles.navContainer}>
         <div className={styles.logo}>
           Voluntering. <br /> Made. <br /> Easy.
           <img
@@ -24,8 +32,6 @@ export const NavigationBar = ({ home, logout, profile, tracker }) => {
             alt="leave-img"
           />
         </div>
-
-        <div className={styles.textStyle}>Welcome, John</div>
 
         <div className={styles.menuIcon} onClick={toggleNavList}>
           <MenuOutlined />
@@ -54,18 +60,19 @@ export const NavigationBar = ({ home, logout, profile, tracker }) => {
             <Button
               className={styles.content}
               type="text"
-              onClick={() => navigate(profile)}
+              onClick={() => navigate(tab1)}
             >
-              Profile
+              {tab1Name}
             </Button>
             <Button
               className={styles.content}
               type="text"
-              onClick={() => navigate(tracker)}
+              onClick={() => navigate(tab2)}
             >
-              Tracker
+              {tab2Name}
             </Button>
           </div>
+        </div>
         </div>
       </div>
     </>

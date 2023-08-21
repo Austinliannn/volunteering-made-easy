@@ -1,8 +1,8 @@
 .content {
-    width: 200px;
+    width: 13vw;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 820px) {
     .content {
         width: 75vw;
         padding-bottom: 5px;

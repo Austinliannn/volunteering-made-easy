@@ -1,0 +1,44 @@
+.container {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+.topRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 70vw;
+    margin: 4vh 0;
+}
+
+.eventSelector{
+    width: 200px;
+    margin-left: 5px;
+}
+
+.checkOut {
+    margin-left: 20px;
+}
+
+.tableContainer {
+    width: 70vw;
+}
+
+@media screen and (max-width: 820px) {
+    .topRow {
+        flex-direction: column;
+        align-items: center;
+        width: 80vw;
+    }
+
+    .checkBtn{
+        margin-top: 4vh;
+    }
+
+    .tableContainer {
+        width: 90vw;
+    }
+}

@@ -87,12 +87,12 @@ function VolSignUpForm({onFinish}) {
       </Form.Item>
 
       <Form.Item
-        name="phone"
-        label="Phone Number"
+        name="contact"
+        label="Contact Number"
         rules={[
           {
             required: true,
-            message: "Please input your phone number!",
+            message: "Please input your Contact number!",
           },
         ]}
       >

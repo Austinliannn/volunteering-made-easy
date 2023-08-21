@@ -1,0 +1,56 @@
+.container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 70vw;
+  margin: 4vh 0;
+}
+
+.tableContainer {
+  width: 70vw;
+  background-color: #6a7775;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.headerText {
+  margin-bottom: 20px;
+  text-decoration: underline;
+  color: white;
+}
+
+.actionsBtn {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.addBtn {
+  background-color: #52c41a;
+}
+
+@media screen and (max-width: 820px) {
+  .topRow {
+    align-items: flex-start;
+    width: 90vw;
+  }
+
+  .tableContainer {
+    width: 90vw;
+  }
+
+  .customTable {
+    overflow: auto;
+
+    .ant-table-cell {
+      background: white;
+    }
+  }
+}

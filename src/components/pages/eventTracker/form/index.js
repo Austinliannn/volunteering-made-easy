@@ -1,15 +1,15 @@
 import React from "react";
-import { Modal } from "antd";
-import { Form, Input, Button, Select } from "antd";
+import { Form, Input, Button, Select, Modal } from "antd";
 import styles from "../styles.module.css";
 const { Option } = Select;
 
-function EditModal({ isModalOpen, handleCancel, onFinish }) {
+function NewEventModal({ isModalOpen, handleCancel, onFinish }) {
   const [form] = Form.useForm();
+  const { TextArea } = Input;
 
   return (
     <Modal
-      title="Edit Profile"
+      title="Post New Event"
       open={isModalOpen}
       onCancel={handleCancel}
       okButtonProps={{ style: { display: "none" } }}
@@ -18,22 +18,18 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
     >
       <Form
         form={form}
-        name="update"
+        name="addEvent"
         onFinish={onFinish}
         scrollToFirstError
         className={styles.tabContent}
       >
         <Form.Item
-          name="email"
-          label="Email"
+          name="eventName"
+          label="Event Name"
           rules={[
             {
-              type: "email",
-              message: "The input is not valid Email!",
-            },
-            {
               required: true,
-              message: "Please input your Email!",
+              message: "Please input your Event Name!",
             },
           ]}
         >
@@ -41,12 +37,12 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
         </Form.Item>
 
         <Form.Item
-          name="firstName"
-          label="First Name"
+          name="startDate"
+          label="Start Date"
           rules={[
             {
               required: true,
-              message: "Please input your first name!",
+              message: "Please input your Start Date!",
             },
           ]}
         >
@@ -54,12 +50,25 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
         </Form.Item>
 
         <Form.Item
-          name="lastName"
-          label="Last Name"
+          name="endDate"
+          label="End Date"
           rules={[
             {
               required: true,
-              message: "Please input your last name!",
+              message: "Please input your End Date!",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          name="inCharge"
+          label="In-Charge"
+          rules={[
+            {
+              required: true,
+              message: "Please input your naem of In-Charge!",
             },
           ]}
         >
@@ -69,17 +78,10 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
         <Form.Item
           name="contact"
           label="Contact Number"
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          name="website"
-          label="Website"
           rules={[
             {
               required: true,
-              message: "Please input website!",
+              message: "Please input your Contact Number!",
             },
           ]}
         >
@@ -138,8 +140,21 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
         </Form.Item>
 
         <Form.Item
-          name="image"
-          label="Upload Image"
+          name="description"
+          label="Description"
+          rules={[
+            {
+              required: true,
+              message: "Please input your Description!",
+            },
+          ]}
+        >
+          <TextArea rows={4} />
+        </Form.Item>
+
+        <Form.Item
+          name="eventImage"
+          label="Event Image"
           rules={[
             {
               required: true,
@@ -152,7 +167,7 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
 
         <Form.Item className={styles.applyBtn}>
           <Button type="primary" htmlType="submit">
-            Update
+            Add Event
           </Button>
         </Form.Item>
       </Form>
@@ -160,4 +175,4 @@ function EditModal({ isModalOpen, handleCancel, onFinish }) {
   );
 };
 
-export default EditModal;
+export default NewEventModal;
