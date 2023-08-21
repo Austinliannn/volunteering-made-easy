@@ -18,7 +18,6 @@ function App() {
           <Route path="/volunteer" element={<VolunteerHome />} />
           <Route path="/profile" element={<VolunteerProfile />} />
           <Route path="/tracker" element={<VolunteerTracker />} />
-
           <Route path="/organization" element={<OrganizationHome />} />
           <Route path="/applicant" element={<ApplicantTracker />} />
           <Route path="/event" element={<EventTracker />} />
