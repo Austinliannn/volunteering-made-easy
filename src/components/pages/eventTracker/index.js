@@ -1,113 +1,92 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.css";
 import { Table, Button } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
-import NewEventModal from "./form";
+import NewFormModal from "../../shared/customModalForm";
+import { CustomModal } from "../../shared/customModal";
+import { mockEvents } from "../mockData";
+import { formSet, currentEventColumn, completedEventColumn } from "./config";
 
 function EventTracker() {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
+  const [selectedModalData, setSelectedModalData] = useState(null);
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const showAddModal = () => {
+    setIsAddModalOpen(true);
   };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const showEditModal = () => {
+    setIsEditModalOpen(true);
+  };
+  const handleEditCancel = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const showViewModal = (data) => {
+    setSelectedModalData(data);
+    setIsViewModalOpen(true);
+  };
+  const handleViewCancel = () => {
+    setIsViewModalOpen(false);
   };
 
   const addOnFinish = (values) => {
     console.log("Added new Event: ", values);
   };
 
-  const currentEventColumn = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Volunteers",
-      dataIndex: "volunteers",
-      key: "volunteers",
-    },
-    {
-      title: "Start Date",
-      dataIndex: "startDate",
-      key: "startDate",
-    },
-    {
-      title: "End Date",
-      dataIndex: "endDate",
-      key: "endDate",
-    },
-    {
-      title: "In-Charge",
-      dataIndex: "inCharge",
-      key: "inCharge",
-    },
-    {
-      title: "Contact",
-      dataIndex: "contact",
-      key: "contact",
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "",
-      dataIndex: "actions",
-      key: "actions",
-    },
-  ];
+  const editOnFinish = (values) => {
+    console.log("Edit Event: ", values);
+  };
 
-  const currentEventDS = [
-    {
-      key: "1",
-      name: "Help the Elderly",
-      volunteers: "20",
-      startDate: "11/6/2023",
-      endDate: "23/6/2023",
-      inCharge: "Charles",
-      contact: "98765432",
-      location: "Hougang",
-      actions: (
-        <div className="actionsBtn">
-          <Button type="primary" onClick={() => ""}>
-            Edit
-          </Button>
-          <Button type="primary" className="addBtn" onClick={() => ""}>
-            Complete
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const currentEventDS = mockEvents
+    .flatMap((event, index) => {
+      if (!event.completed) {
+        return {
+          key: index,
+          name: event.eventName,
+          volunteers: event.acceptedVolunteers.length,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          inCharge: event.inCharge,
+          contact: event.contact,
+          location: event.location.join(", "),
+          actions: (
+            <div className="actionsBtn">
+              <Button type="primary" onClick={() => showEditModal()}>
+                Edit
+              </Button>
+              <Button type="primary" className="addBtn" onClick={() => ""}>
+                Complete
+              </Button>
+            </div>
+          ),
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
 
-  const completedEventColumn = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "",
-      dataIndex: "actions",
-      key: "actions",
-    },
-  ];
-
-  const completedEventDS = [
-    {
-      key: "1",
-      name: "Help the Dops",
-      actions: (
-        <Button type="primary" onClick={() => ""}>
-          View
-        </Button>
-      ),
-    },
-  ];
+  const completedEventDS = mockEvents
+    .flatMap((event, index) => {
+      if (event.completed) {
+        return {
+          key: index,
+          name: event.eventName,
+          actions: (
+            <Button type="primary" onClick={() => showViewModal(event)}>
+              View
+            </Button>
+          ),
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
 
   return (
     <>
@@ -128,16 +107,18 @@ function EventTracker() {
                 <h2 className="headerText">Current Events: </h2>
               </div>
               <div>
-                <Button type="primary" onClick={() => showModal()}>
+                <Button type="primary" onClick={() => showAddModal()}>
                   Post New Event
                 </Button>
               </div>
             </div>
-            <Table
-              className="customTable"
-              dataSource={currentEventDS}
-              columns={currentEventColumn}
-            />
+            <div>
+              <Table
+                className="customTable"
+                dataSource={currentEventDS}
+                columns={currentEventColumn}
+              />
+            </div>
           </div>
 
           <div className={styles.completedList}>
@@ -150,10 +131,29 @@ function EventTracker() {
         </div>
       </div>
 
-      <NewEventModal
-        isModalOpen={isModalOpen}
-        handleCancel={handleCancel}
+      <NewFormModal
+        modalTitle={"Post New Event"}
+        isModalOpen={isAddModalOpen}
+        handleCancel={handleAddCancel}
         onFinish={addOnFinish}
+        formSet={formSet}
+        submitText= {"Confirm"}
+      />
+
+      <NewFormModal
+        modalTitle={"Edit Event"}
+        isModalOpen={isEditModalOpen}
+        handleCancel={handleEditCancel}
+        onFinish={editOnFinish}
+        formSet={formSet}
+        submitText= {"Update"}
+      />
+
+      <CustomModal
+        data={selectedModalData}
+        isModalOpen={isViewModalOpen}
+        handleCancel={handleViewCancel}
+        displayOk={false}
       />
     </>
   );

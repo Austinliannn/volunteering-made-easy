@@ -11,7 +11,6 @@ export const DropDownSelect = ({ title, placeholder, options, onChange, mode }) 
           mode={mode}
           allowClear
           placeholder={placeholder}
-          defaultValue={[]}
           onChange={onChange}
           options={options}
         />

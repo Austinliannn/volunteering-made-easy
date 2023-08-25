@@ -1,0 +1,1 @@
+export const backendApiUrl = 'http://localhost:8080/api';

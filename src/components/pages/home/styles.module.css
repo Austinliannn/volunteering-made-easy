@@ -12,7 +12,7 @@
   justify-content: space-evenly;
   align-items: center;
   margin-top: 6vh;
-  width: 70vw;
+  width: 80vw;
 }
 
 .title {
@@ -40,12 +40,12 @@
 
 .topRow {
   display: flex;
-  width: 70vw;
+  width: 80vw;
   margin: 4vh 0;
 }
 
 .tableContainer {
-  width: 70vw;
+  width: 80vw;
   background-color: #6a7775;
   padding: 10px;
   border-radius: 10px;
@@ -54,6 +54,11 @@
 .headerText {
   margin-bottom: 20px;
   text-decoration: underline;
+}
+
+.eventSelector {
+  margin-left: 5px;
+  width: 16vw;;
 }
 
 @media screen and (max-width: 820px) {
@@ -84,5 +89,9 @@
 
   .tableContainer {
     width: 90vw;
+  }
+
+  .eventSelector {
+    width: 60vw;;
   }
 }

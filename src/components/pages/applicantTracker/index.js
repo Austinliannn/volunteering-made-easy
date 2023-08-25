@@ -1,12 +1,50 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./styles.css";
 import { Select, Table, Button } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
+import { mockEvents } from "../mockData";
 
 function ApplicantTracker() {
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [ddlEvent, setDdlEvent] = React.useState([]);
+
+  const handleChange = (selectedValues) => {
+    const newFilteredEvents = mockEvents.filter((event) => {
+      if (selectedValues === undefined || selectedValues.length === 0) {
+        return event;
+      } else {
+        return selectedValues.includes(capitalize(event.eventName));
+      }
+    });
+    setFilteredEvents(newFilteredEvents);
   };
+
+  const capitalize = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
+  };
+
+  const capitalzeLabel = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  useEffect(() => {
+    const eventsArray = [
+      ...new Set(mockEvents.map((event) => event.eventName)),
+    ];
+    const createOptions = (array) => {
+      return array.map((item) => ({
+        value: capitalize(item),
+        label: capitalzeLabel(item),
+      }));
+    };
+    setDdlEvent(createOptions(eventsArray));
+  }, []);
 
   const columns = [
     {
@@ -15,19 +53,14 @@ function ApplicantTracker() {
       key: "name",
     },
     {
-      title: "Website",
-      dataIndex: "website",
-      key: "website",
+      title: "Link",
+      dataIndex: "link",
+      key: "link",
     },
     {
       title: "Skills",
-      dataIndex: "skills",
-      key: "skills",
-    },
-    {
-      title: "Interests",
-      dataIndex: "interests",
-      key: "interests",
+      dataIndex: "skill",
+      key: "skill",
     },
     {
       title: "Email",
@@ -46,17 +79,16 @@ function ApplicantTracker() {
     },
   ];
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "JohnDoe",
-      website: "link",
-      skills: ["Web Development", "JS"],
-      interests: ["JavaScript", "BasketBall"],
-      email: "JohnDoe@testmail.com",
-      contact: "98765432",
+  const dataSource = filteredEvents.flatMap((event) =>
+    event.applicants.map((data, index) => ({
+      key: `${event._id}-${index}`,
+      name: data.firstName + " " + data.lastName,
+      link: data.link,
+      skill: data.skill.join(", "),
+      email: data.email,
+      contact: data.contact,
       actions: (
-        <div className='actionsBtn'>
+        <div className="actionsBtn">
           <Button type="primary" className="addBtn" onClick={() => ""}>
             +
           </Button>
@@ -65,14 +97,8 @@ function ApplicantTracker() {
           </Button>
         </div>
       ),
-    },
-  ];
-
-  const formattedDataSource = dataSource.map((item) => ({
-    ...item,
-    skills: item.skills.join(", "),
-    interests: item.interests.join(", "),
-  }));
+    }))
+  );
 
   return (
     <>
@@ -92,12 +118,8 @@ function ApplicantTracker() {
             <Select
               placeholder="Select an event"
               onChange={handleChange}
-              options={[
-                { value: "jack", label: "Jack" },
-                { value: "lucy", label: "Lucy" },
-                { value: "Yiminghe", label: "yiminghe" },
-                { value: "disabled", label: "Disabled", disabled: true },
-              ]}
+              options={ddlEvent}
+              allowClear
               className="eventSelector"
             />
           </div>
@@ -107,7 +129,7 @@ function ApplicantTracker() {
           <h2 className="headerText">Applicant List:</h2>
           <Table
             className="customTable"
-            dataSource={formattedDataSource}
+            dataSource={dataSource}
             columns={columns}
           />
         </div>

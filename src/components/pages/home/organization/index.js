@@ -1,12 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles.module.css";
 import { Select, Table, Button } from "antd";
 import { NavigationBar } from "../../../shared/navigationBar";
+import { mockEvents } from "../../mockData";
 
 function OrganizationHome() {
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [ddlEvent, setDdlEvent] = React.useState([]);
+
+  const handleChange = (selectedValues) => {
+    const newFilteredEvents = mockEvents.filter((event) => {
+      if (selectedValues === undefined || selectedValues.length === 0) {
+        return event;
+      } else {
+        return selectedValues.includes(capitalize(event.eventName));
+      }
+    });
+    setFilteredEvents(newFilteredEvents);
   };
+
+  const handleRemove = (eventId, data) => {
+    console.log(eventId, data)
+  };
+
+  const capitalize = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
+  };
+
+  const capitalzeLabel = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  useEffect(() => {
+    const eventsArray = [
+      ...new Set(mockEvents.map((event) => event.eventName)),
+    ];
+    const createOptions = (array) => {
+      return array.map((item) => ({
+        value: capitalize(item),
+        label: capitalzeLabel(item),
+      }));
+    };
+    setDdlEvent(createOptions(eventsArray));
+  }, []);
 
   const columns = [
     {
@@ -41,21 +83,21 @@ function OrganizationHome() {
     },
   ];
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "Josh",
-      event: "Help the Dogs",
-      email: "Josh@testmail.com",
-      contact: "98765432",
-      link: "link",
+  const dataSource = filteredEvents.flatMap((event) =>
+    event.acceptedVolunteers.map((data, index) => ({
+      key: `${event._id}-${index}`,
+      name: data.firstName + " " + data.lastName,
+      event: event.eventName,
+      email: data.email,
+      contact: data.contact,
+      link: data.link,
       actions: (
-        <Button type="primary" danger onClick={() => ""}>
+        <Button type="primary" danger onClick={() => handleRemove(event._id, data)}>
           Remove
         </Button>
       ),
-    },
-  ];
+    }))
+  );
 
   return (
     <>
@@ -75,12 +117,8 @@ function OrganizationHome() {
             <Select
               placeholder="Select an event"
               onChange={handleChange}
-              options={[
-                { value: "jack", label: "Jack" },
-                { value: "lucy", label: "Lucy" },
-                { value: "Yiminghe", label: "yiminghe" },
-                { value: "disabled", label: "Disabled", disabled: true },
-              ]}
+              options={ddlEvent}
+              allowClear
               className={styles.eventSelector}
             />
           </div>
@@ -88,7 +126,11 @@ function OrganizationHome() {
 
         <div className={styles.tableContainer}>
           <h2 className="headerText">Volunteer List:</h2>
-          <Table className="customTable" dataSource={dataSource} columns={columns} />
+          <Table
+            className="customTable"
+            dataSource={dataSource}
+            columns={columns}
+          />
         </div>
       </div>
     </>

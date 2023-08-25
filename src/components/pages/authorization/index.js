@@ -1,11 +1,13 @@
 import React from "react";
-import styles from './styles.module.css';
+import styles from "./styles.module.css";
 import { Button, Tabs } from "antd";
+import { tabItems } from "./config";
 import leavesImage from "../../../assets/leaves.jpg";
 import loginImage from "../../../assets/login-img.jpg";
-import LoginForm from "./loginForm";
-import VolSignUpForm from "./signUpForm/volunteer";
-import OrgSignUpForm from "./signUpForm/organization";
+import {
+  registerVolunteers,
+  registerOrganizations,
+} from "../../../services/api";
 
 function Login() {
   const [volunteerToggle, setVolunteerToggle] = React.useState(true);
@@ -20,26 +22,11 @@ function Login() {
 
   const signUpOnFinish = (values) => {
     if (volunteerToggle) {
-      console.log("Volunteer received values of form: ", values);
+      registerVolunteers(values);
     } else {
-      console.log("Organization received values of form: ", values);
+      registerOrganizations(values);
     }
   };
-
-  const items = [
-    {
-      key: "1",
-      label: `Login`,
-      children: LoginForm(loginOnFinish),
-    },
-    {
-      key: "2",
-      label: `Sign Up`,
-      children: volunteerToggle
-        ? VolSignUpForm(signUpOnFinish)
-        : OrgSignUpForm(signUpOnFinish),
-    },
-  ];
 
   const onClickHandle = () => {
     volunteerToggle ? setVolunteerToggle(false) : setVolunteerToggle(true);
@@ -49,7 +36,11 @@ function Login() {
     <>
       <div className={styles.container}>
         <div className={styles.nav}>
-          <Button className={styles.toggleBtn} size={"large"} onClick={onClickHandle}>
+          <Button
+            className={styles.toggleBtn}
+            size={"large"}
+            onClick={onClickHandle}
+          >
             {volunteerToggle ? "Volunteer" : "Organization"}
           </Button>
         </div>
@@ -59,7 +50,11 @@ function Login() {
         <div className={styles.content}>
           <div className={styles.title}>
             Volunteering. Made. Easy.
-            <img src={leavesImage} className={styles.leavesImage} alt="leave-img" />
+            <img
+              src={leavesImage}
+              className={styles.leavesImage}
+              alt="leave-img"
+            />
             <div className={styles.subtitle}>
               “The best way to find yourself is to lose yourself in the service
               of others.” – Gandhi
@@ -67,7 +62,11 @@ function Login() {
           </div>
 
           <div className={styles.formBox}>
-            <Tabs defaultActiveKey="1" type="card" items={items}/>
+            <Tabs
+              defaultActiveKey="1"
+              type="card"
+              items={tabItems(volunteerToggle, loginOnFinish, signUpOnFinish)}
+            />
           </div>
         </div>
       </div>

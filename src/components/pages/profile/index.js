@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
-import profilePic from "../../../assets/man.png";
 import { Divider, List, Badge, Button } from "antd";
-import EditModal from "./form";
-
+import { mockUsers } from "../mockData";
+import NewFormModal from "../../shared/customModalForm";
+import { formSet } from "./config";
 
 function VolunteerProfile() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -20,42 +20,25 @@ function VolunteerProfile() {
     console.log("Volunteer edit values of form: ", values);
   };
 
-  const data = {
-    name: "John Doe",
-    link: "www.johndoe.com",
-    skills: [
-      { text: "Web Development", color: "#17A2B8" },
-      { text: "HTML", color: "#17A2B8" },
-      { text: "CSS", color: "#17A2B8" },
-      { text: "JavaScript", color: "#17A2B8" },
-    ],
-    interests: [
-      { text: "Basketball", color: "#17A2B8" },
-      { text: "Soccer", color: "#17A2B8" },
-      { text: "Coding", color: "#17A2B8" },
-      { text: "JavaScript", color: "#17A2B8" },
-    ],
-    locations: [
-      { text: "Bedok", color: "#28A745" },
-      { text: "Serangoon", color: "#eab308" },
-      { text: "Yishun", color: "#b91c1c" },
-    ],
-    events: ["Help the Dog", "Help the Cat", "Help the Elephant"],
-  };
+  const data = mockUsers[0];
 
   return (
     <>
       <NavigationBar
         home="/volunteer"
         logout="/"
-        tab1="/tracker"
-        tab1Name="Tracker"
-        tab2="/profile"
-        tab2Name="Profile"
+        tab1="/profile"
+        tab1Name="Profile"
+        tab2="/tracker"
+        tab2Name="Tracker"
       />
       <div className={styles.container}>
         <div className={styles.editContainer}>
-          <Button className={styles.editBtn} type="primary" onClick={() => showModal()}>
+          <Button
+            className={styles.editBtn}
+            type="primary"
+            onClick={() => showModal()}
+          >
             Edit Profile
           </Button>
         </div>
@@ -65,12 +48,12 @@ function VolunteerProfile() {
           <div className={styles.profContainer}>
             <div className={styles.header}>
               <img
-                src={profilePic}
+                src={data.image}
                 className={styles.profileImage}
                 alt="profile-img"
               />
               <div>
-                <h1>{data.name}</h1>
+                <h1>{data.firstName + "\n" + data.lastName}</h1>
               </div>
               <div>
                 Website/Linkedin: <a href={data.link}>{data.link}</a>
@@ -80,25 +63,11 @@ function VolunteerProfile() {
             <div className={styles.traitsContainer}>
               <h2>Skills: </h2>
               <div className={styles.badgesContainer}>
-                {data.skills.map(({ text, color }, index) => (
+                {data.skill.map((data, index) => (
                   <Badge
                     key={index}
-                    count={text}
-                    color={color}
-                    className={styles.badgeStyle}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.traitsContainer}>
-              <h2>Interests: </h2>
-              <div className={styles.badgesContainer}>
-                {data.interests.map(({ text, color }, index) => (
-                  <Badge
-                    key={index}
-                    count={text}
-                    color={color}
+                    count={data}
+                    color="blue"
                     className={styles.badgeStyle}
                   />
                 ))}
@@ -108,11 +77,11 @@ function VolunteerProfile() {
             <div className={styles.traitsContainer}>
               <h2>Locations: </h2>
               <div className={styles.badgesContainer}>
-                {data.locations.map(({ text, color }, index) => (
+                {data.location.map((data, index) => (
                   <Badge
                     key={index}
-                    count={text}
-                    color={color}
+                    count={data}
+                    color="green"
                     className={styles.badgeStyle}
                   />
                 ))}
@@ -123,7 +92,7 @@ function VolunteerProfile() {
             <Divider orientation="center">Past Events:</Divider>
             <List
               size="small"
-              dataSource={data.events}
+              dataSource={data.acceptedEvents}
               renderItem={(item) => <List.Item>{item}</List.Item>}
               pagination={{
                 align: "center",
@@ -133,10 +102,12 @@ function VolunteerProfile() {
         </div>
       </div>
 
-      <EditModal
+      <NewFormModal
+        modalTitle={"Edit Profile"}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         onFinish={editOnFinish}
+        formSet={formSet}
       />
     </>
   );

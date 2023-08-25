@@ -16,18 +16,41 @@
     text-align: center;
   }
 }
+
 .imgStyle {
   height: 30vh;
   border-radius: 10px;
+}
+
+.topContainer{
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  padding: 10px 0;
+}
+
+.orgContainer{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .imgContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px 0;
 }
 
-.desContainer{
-    padding-bottom: 10px;
+.midContainer {
+  padding-bottom: 10px;
+}
+
+.badgeRow {
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 820px) {
+  .topContainer{
+    flex-direction: column;
+  }
 }

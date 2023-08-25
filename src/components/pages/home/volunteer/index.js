@@ -1,98 +1,121 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles.module.css";
 import { NavigationBar } from "../../../shared/navigationBar";
 import { DropDownSelect } from "../../../shared/dropDownSelect";
 import { CustomCard } from "../../../shared/customCard";
 import { CustomModal } from "../../../shared/customModal";
-import poster from "../../../../assets/job.jpg";
+import { mockEvents } from "../../mockData";
 
 function VolunteerHome() {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedModalData, setSelectedModalData] = React.useState(null);
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [ddlCauses, setDdlCauses] = useState([]);
+  const [ddlSkills, setDdlSkills] = useState([]);
+  const [ddlLocations, setDdlLocations] = useState([]);
+  const [ddlAvailability, setDdlAvailability] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedModalData, setSelectedModalData] = useState(null);
 
   const showModal = (data) => {
     setSelectedModalData(data);
     setIsModalOpen(true);
   };
-  const handleOk = () => {
-    setIsModalOpen(false);
+  const handleOk = () => setIsModalOpen(false);
+  const handleCancel = () => setIsModalOpen(false);
+
+  const capitalize = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
   };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+
+  const capitalzeLabel = (data) => {
+    return data
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   };
 
-  const modalData = [
-    {
-      title: "Help the Dogs",
-      summary:
-        "“Help the Dogs” is a initiative to rescue abandon dogs who are left behind by their owners. We aim to create a website for this initiative.",
-      description:
-        "“Help the Dogs” is a initiative to rescue abandon dogs who are left behind by their owners. We aim to create a website to spread awareness and seek for volunteers who are interested to help. The website should consist of a few pages such as landing page, area tracking page, etc, etc. Reach out to us if you have the skills or wish to learn a new skill such as creating websites.",
-      badgesData: [
-        { text: "Web Development", color: "#17A2B8" },
-        { text: "HTML", color: "#17A2B8" },
-        { text: "CSS", color: "#17A2B8" },
-        { text: "JavaScript", color: "#17A2B8" },
-        { text: "Bedok", color: "#28A745" },
-        { text: "Animal", color: "#28A745" },
-      ],
-      image: poster,
-    },
-  ];
+  useEffect(() => {
+    const causesArray = [...new Set(mockEvents.map((event) => event.cause))];
+    const skillsArray = [
+      ...new Set(mockEvents.flatMap((event) => event.skill)),
+    ];
+    const locationsArray = [
+      ...new Set(mockEvents.flatMap((event) => event.location)),
+    ];
+    const availabilitiesArray = [
+      ...new Set(mockEvents.map((event) => event.startDate)),
+    ];
 
-  const options = [
-    {
-      value: "jack",
-      label: "Jack",
-    },
-    {
-      value: "lucy",
-      label: "Lucy",
-    },
-    {
-      value: "tom",
-      label: "Tom",
-    },
-  ];
+    const createOptions = (array) => {
+      return array.map((item) => ({
+        value: capitalize(item),
+        label: capitalzeLabel(item),
+      }));
+    };
 
-  const DDSHandleChange = (value) => {
-    console.log(`selected ${value}`);
+    setDdlCauses(createOptions(causesArray));
+    setDdlSkills(createOptions(skillsArray));
+    setDdlLocations(createOptions(locationsArray));
+    setDdlAvailability(createOptions(availabilitiesArray));
+  }, []);
+
+  const DDSHandleChange = (title, selectedValues) => {
+    const newFilteredEvents = mockEvents.filter((event) => {
+      if (selectedValues === undefined || selectedValues.length === 0) {
+        return true;
+      }
+      if (title === "Cause") {
+        return selectedValues.includes(capitalize(event.cause));
+      }
+      if (title === "Skills") {
+        return event.skill.some((skill) =>
+          selectedValues.includes(capitalize(skill))
+        );
+      }
+      if (title === "Locations") {
+        return event.location.some((location) =>
+          selectedValues.includes(capitalize(location))
+        );
+      }
+      if (title === "Availability") {
+        return selectedValues.includes(event.startDate);
+      }
+      return true;
+    });
+    setFilteredEvents(newFilteredEvents);
   };
 
   const filters = [
     {
-      title: "Skills",
-      placeholder: "Select Skill",
-      options: options,
-      onChange: DDSHandleChange(),
-      mode: "multiple",
+      title: "Cause",
+      placeholder: "Select Cause",
+      options: ddlCauses,
+      onChange: (selectedValues) => DDSHandleChange("Cause", selectedValues),
+      mode: "",
     },
     {
-      title: "Interest",
-      placeholder: "Select Interest",
-      options: options,
-      onChange: DDSHandleChange(),
+      title: "Skills",
+      placeholder: "Select Skill",
+      options: ddlSkills,
+      onChange: (selectedValues) => DDSHandleChange("Skills", selectedValues),
       mode: "multiple",
     },
     {
       title: "Location",
       placeholder: "Select Location",
-      options: options,
-      onChange: DDSHandleChange(),
-      mode: "",
-    },
-    {
-      title: "Cause",
-      placeholder: "Select Cause",
-      options: options,
-      onChange: DDSHandleChange(),
+      options: ddlLocations,
+      onChange: (selectedValues) =>
+        DDSHandleChange("Locations", selectedValues),
       mode: "",
     },
     {
       title: "Availability",
-      placeholder: "Select Availability",
-      options: options,
-      onChange: DDSHandleChange(),
+      placeholder: "Select From",
+      options: ddlAvailability,
+      onChange: (selectedValues) =>
+        DDSHandleChange("Availability", selectedValues),
       mode: "",
     },
   ];
@@ -102,23 +125,16 @@ function VolunteerHome() {
       <NavigationBar
         home="/volunteer"
         logout="/"
-        tab1="/tracker"
-        tab1Name="Tracker"
-        tab2="/profile"
-        tab2Name="Profile"
+        tab1="/profile"
+        tab1Name="Profile"
+        tab2="/tracker"
+        tab2Name="Tracker"
       />
 
       <div className={styles.container}>
         <div className={styles.filter}>
           {filters.map((data, index) => (
-            <DropDownSelect
-              key={index}
-              title={data.title}
-              placeholder={data.placeholder}
-              options={data.options}
-              onChange={data.onChange}
-              mode={data.mode}
-            />
+            <DropDownSelect key={index} {...data} />
           ))}
         </div>
       </div>
@@ -129,14 +145,9 @@ function VolunteerHome() {
 
       <div className={styles.container}>
         <div className={styles.carouselContainer}>
-          {modalData.map((data, index) => (
+          {filteredEvents.map((data, index) => (
             <div key={index} className={styles.cardDiv}>
-              <CustomCard
-                title={data.title}
-                summary={data.summary}
-                badges={data.badgesData}
-                onClick={() => showModal(data)}
-              />
+              <CustomCard data={data} onClick={() => showModal(data)} />
             </div>
           ))}
           <CustomModal
@@ -144,6 +155,7 @@ function VolunteerHome() {
             isModalOpen={isModalOpen}
             handleOk={handleOk}
             handleCancel={handleCancel}
+            displayOk={true}
           />
         </div>
       </div>
