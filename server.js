@@ -4,6 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const userRoutes = require("./server/routes/userRoutes");
 const authRoutes = require("./server/routes/auth");
+const eventRoutes = require("./server/routes/eventRoutes");
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(cors());
 
 app.use("/api", userRoutes);
 app.use("/api", authRoutes);
+app.use("/api", eventRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

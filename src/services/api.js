@@ -44,3 +44,14 @@ export async function registerOrganizations(data) {
       console.error("Organization Registration error:", error);
     }
   }
+
+export async function fetchAllEvents() {
+  try {
+    const response = await axios.get(backendApiUrl + "/events");
+    const events = response.data;
+    console.log("Events:", events);
+    return events;
+  } catch (error) {
+    console.error("Error fetching Events:", error);
+  }
+}

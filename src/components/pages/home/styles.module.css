@@ -38,6 +38,14 @@
   padding: 20px 20px 0px 20px;
 }
 
+.loadingDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90vw;
+  height: 25vh;
+}
+
 .topRow {
   display: flex;
   width: 80vw;
