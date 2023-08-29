@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
 import { Divider, List, Badge, Button } from "antd";
-import { mockUsers } from "../mockData";
 import NewFormModal from "../../shared/customModalForm";
 import { formSet } from "./config";
+import { fetchUser, updateUser } from "../../../services/api";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function VolunteerProfile() {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profileData, setProfileData] = useState();
+  const [eventData, setEventData] = useState();
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -16,11 +19,28 @@ function VolunteerProfile() {
     setIsModalOpen(false);
   };
 
-  const editOnFinish = (values) => {
-    console.log("Volunteer edit values of form: ", values);
+  const fetchuserData = () => {
+    fetchUser("64e6f3589f09f2395f0cf854").then((profData) => {
+      setProfileData(profData.user);
+      setEventData(profData.acceptedEvents);
+    });
   };
 
-  const data = mockUsers[0];
+  const editOnFinish = async (values) => {
+    const response = await updateUser("64e6f3589f09f2395f0cf854", values);
+    try {
+      if (response.message === "Successful") {
+        setIsModalOpen(false);
+        fetchuserData();
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchuserData();
+  }, []);
 
   return (
     <>
@@ -32,75 +52,87 @@ function VolunteerProfile() {
         tab2="/tracker"
         tab2Name="Tracker"
       />
-      <div className={styles.container}>
-        <div className={styles.editContainer}>
-          <Button
-            className={styles.editBtn}
-            type="primary"
-            onClick={() => showModal()}
-          >
-            Edit Profile
-          </Button>
-        </div>
-      </div>
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <div className={styles.profContainer}>
-            <div className={styles.header}>
-              <img
-                src={data.image}
-                className={styles.profileImage}
-                alt="profile-img"
-              />
-              <div>
-                <h1>{data.firstName + "\n" + data.lastName}</h1>
-              </div>
-              <div>
-                Website/Linkedin: <a href={data.link}>{data.link}</a>
-              </div>
+      {profileData !== undefined ? (
+        <>
+          <div className={styles.container}>
+            <div className={styles.editContainer}>
+              <Button
+                className={styles.editBtn}
+                type="primary"
+                onClick={() => showModal()}
+              >
+                Edit Profile
+              </Button>
             </div>
-
-            <div className={styles.traitsContainer}>
-              <h2>Skills: </h2>
-              <div className={styles.badgesContainer}>
-                {data.skill.map((data, index) => (
-                  <Badge
-                    key={index}
-                    count={data}
-                    color="blue"
-                    className={styles.badgeStyle}
+          </div>
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <div className={styles.profContainer}>
+                <div className={styles.header}>
+                  <img
+                    src={profileData.image}
+                    className={styles.profileImage}
+                    alt="profile-img"
                   />
-                ))}
+                  <div>
+                    <h1>
+                      {profileData.firstName + "\n" + profileData.lastName}
+                    </h1>
+                  </div>
+                  <div>
+                    Website/Linkedin:{" "}
+                    <a href={profileData.link}>{profileData.link}</a>
+                  </div>
+                </div>
+
+                <div className={styles.traitsContainer}>
+                  <h2>Skills: </h2>
+                  <div className={styles.badgesContainer}>
+                    {profileData.skill.map((data, index) => (
+                      <Badge
+                        key={index}
+                        count={data}
+                        color="blue"
+                        className={styles.badgeStyle}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.traitsContainer}>
+                  <h2>Locations: </h2>
+                  <div className={styles.badgesContainer}>
+                    {profileData.location.map((data, index) => (
+                      <Badge
+                        key={index}
+                        count={data}
+                        color="green"
+                        className={styles.badgeStyle}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div className={styles.traitsContainer}>
-              <h2>Locations: </h2>
-              <div className={styles.badgesContainer}>
-                {data.location.map((data, index) => (
-                  <Badge
-                    key={index}
-                    count={data}
-                    color="green"
-                    className={styles.badgeStyle}
-                  />
-                ))}
+              <div className={styles.eventContainer}>
+                <Divider orientation="center">Past Events:</Divider>
+                <List
+                  size="small"
+                  dataSource={eventData}
+                  renderItem={(item) => <List.Item>{item.eventName}</List.Item>}
+                  pagination={{
+                    align: "center",
+                  }}
+                />
               </div>
             </div>
           </div>
-          <div className={styles.eventContainer}>
-            <Divider orientation="center">Past Events:</Divider>
-            <List
-              size="small"
-              dataSource={data.acceptedEvents}
-              renderItem={(item) => <List.Item>{item}</List.Item>}
-              pagination={{
-                align: "center",
-              }}
-            />
-          </div>
+        </>
+      ) : (
+        <div className={styles.loadingDiv}>
+          Loading Profile....
+          <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
         </div>
-      </div>
+      )}
 
       <NewFormModal
         modalTitle={"Edit Profile"}
@@ -108,6 +140,7 @@ function VolunteerProfile() {
         handleCancel={handleCancel}
         onFinish={editOnFinish}
         formSet={formSet}
+        submitText={"Confirm"}
       />
     </>
   );

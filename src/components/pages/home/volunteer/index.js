@@ -34,30 +34,32 @@ function VolunteerHome() {
 
   useEffect(() => {
     fetchAllEvents().then((eventsData) => {
-      const causesArray = [...new Set(eventsData.map((event) => event.cause))];
-      const skillsArray = [
-        ...new Set(eventsData.flatMap((event) => event.skill)),
-      ];
-      const locationsArray = [
-        ...new Set(eventsData.flatMap((event) => event.location)),
-      ];
-      const availabilitiesArray = [
-        ...new Set(eventsData.map((event) => event.startDate)),
-      ];
-
-      const createOptions = (array) => {
-        return array.map((item) => ({
-          value: capitalize(item).join(""),
-          label: capitalize(item).join(" "),
-        }));
-      };
-
-      setEventData(eventsData);
-      setFilteredEvents(eventsData);
-      setDdlCauses(createOptions(causesArray));
-      setDdlSkills(createOptions(skillsArray));
-      setDdlLocations(createOptions(locationsArray));
-      setDdlAvailability(createOptions(availabilitiesArray));
+      if (eventsData !== undefined) {
+        const causesArray = [...new Set(eventsData.map((event) => event.cause))];
+        const skillsArray = [
+          ...new Set(eventsData.flatMap((event) => event.skill)),
+        ];
+        const locationsArray = [
+          ...new Set(eventsData.flatMap((event) => event.location)),
+        ];
+        const availabilitiesArray = [
+          ...new Set(eventsData.map((event) => event.startDate)),
+        ];
+  
+        const createOptions = (array) => {
+          return array.map((item) => ({
+            value: capitalize(item).join(""),
+            label: capitalize(item).join(" "),
+          }));
+        };
+  
+        setEventData(eventsData);
+        setFilteredEvents(eventsData);
+        setDdlCauses(createOptions(causesArray));
+        setDdlSkills(createOptions(skillsArray));
+        setDdlLocations(createOptions(locationsArray));
+        setDdlAvailability(createOptions(availabilitiesArray));
+      }
     });
   }, []);
 
@@ -148,8 +150,9 @@ function VolunteerHome() {
         <div className={styles.carouselContainer}>
           {filteredEvents.length === 0 ? (
             <div className={styles.loadingDiv}>
-              <LoadingOutlined style={{ fontSize: 40 }} />
-            </div>
+            Loading Events....
+            <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+          </div>
           ) : (
             filteredEvents.map((data, index) => (
               <div key={index} className={styles.cardDiv}>
