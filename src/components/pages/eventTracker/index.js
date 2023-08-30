@@ -1,17 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
-import { Table, Button } from "antd";
+import { Table, Button, message } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
 import NewFormModal from "../../shared/customModalForm";
 import { CustomModal } from "../../shared/customModal";
-import { mockEvents } from "../mockData";
 import { formSet, currentEventColumn, completedEventColumn } from "./config";
+import {
+  fetchAllEvents,
+  completeEvent,
+  postEvent,
+  fetchUser,
+  updateEvent,
+} from "../../../services/api";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function EventTracker() {
-  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
+  const [eventsData, setEventsData] = useState([]);
+  const [editEventId, setEditEventId] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedModalData, setSelectedModalData] = useState(null);
+
+  const fetchEvents = () => {
+    fetchAllEvents().then((eventData) => {
+      setEventsData(eventData);
+    });
+  };
 
   const showAddModal = () => {
     setIsAddModalOpen(true);
@@ -20,9 +35,11 @@ function EventTracker() {
     setIsAddModalOpen(false);
   };
 
-  const showEditModal = () => {
+  const showEditModal = (eventId) => {
     setIsEditModalOpen(true);
+    setEditEventId(eventId);
   };
+
   const handleEditCancel = () => {
     setIsEditModalOpen(false);
   };
@@ -35,15 +52,56 @@ function EventTracker() {
     setIsViewModalOpen(false);
   };
 
-  const addOnFinish = (values) => {
-    console.log("Added new Event: ", values);
+  const addOnFinish = async (values) => {
+    const orgData = await fetchUser("64e6f5d39f09f2395f0cf85d");
+    const response = await postEvent(values, orgData);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Posted Event!");
+        fetchEvents();
+      }
+    } catch (error) {
+      message.error(
+        "Unable to Post Event. This may occur due to connection problems. Please try again later."
+      );
+    }
+    setIsAddModalOpen(false);
   };
 
-  const editOnFinish = (values) => {
-    console.log("Edit Event: ", values);
+  const editOnFinish = async (values) => {
+    const response = await updateEvent(values, editEventId);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Edited Event!");
+        fetchEvents();
+      }
+    } catch (error) {
+      message.error(
+        "Unable to Edit Event. This may occur due to connection problems. Please try again later."
+      );
+    }
+    setIsEditModalOpen(false);
   };
 
-  const currentEventDS = mockEvents
+  const handleComplete = async (eventId) => {
+    const response = await completeEvent(eventId);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Completed Event! Congratulations!");
+        fetchEvents();
+      }
+    } catch (error) {
+      message.error(
+        "Unable to Complete Event. This may occur due to connection problems. Please try again later."
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const currentEventDS = eventsData
     .flatMap((event, index) => {
       if (!event.completed) {
         return {
@@ -57,10 +115,14 @@ function EventTracker() {
           location: event.location.join(", "),
           actions: (
             <div className="actionsBtn">
-              <Button type="primary" onClick={() => showEditModal()}>
+              <Button type="primary" onClick={() => showEditModal(event._id)}>
                 Edit
               </Button>
-              <Button type="primary" className="addBtn" onClick={() => ""}>
+              <Button
+                type="primary"
+                className="addBtn"
+                onClick={() => handleComplete(event._id)}
+              >
                 Complete
               </Button>
             </div>
@@ -71,7 +133,7 @@ function EventTracker() {
     })
     .filter(Boolean);
 
-  const completedEventDS = mockEvents
+  const completedEventDS = eventsData
     .flatMap((event, index) => {
       if (event.completed) {
         return {
@@ -112,21 +174,35 @@ function EventTracker() {
                 </Button>
               </div>
             </div>
-            <div>
+            {eventsData.length === 0 ? (
+              <div className="loadingDiv">
+                Loading Current Events....
+                <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+              </div>
+            ) : (
               <Table
                 className="customTable"
                 dataSource={currentEventDS}
                 columns={currentEventColumn}
               />
-            </div>
+            )}
           </div>
 
           <div className={styles.completedList}>
             <h2 className="headerText">Completed Events: </h2>
-            <Table
-              dataSource={completedEventDS}
-              columns={completedEventColumn}
-            />
+            {eventsData.length === 0 ? (
+              <div className="loadingDiv">
+                Loading Completed Events....
+                <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+              </div>
+            ) : (
+              <div>
+                <Table
+                  dataSource={completedEventDS}
+                  columns={completedEventColumn}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -137,7 +213,7 @@ function EventTracker() {
         handleCancel={handleAddCancel}
         onFinish={addOnFinish}
         formSet={formSet}
-        submitText= {"Confirm"}
+        submitText={"Confirm"}
       />
 
       <NewFormModal
@@ -146,7 +222,7 @@ function EventTracker() {
         handleCancel={handleEditCancel}
         onFinish={editOnFinish}
         formSet={formSet}
-        submitText= {"Update"}
+        submitText={"Update"}
       />
 
       <CustomModal

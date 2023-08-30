@@ -1,53 +1,66 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles.module.css";
-import { Select, Table, Button } from "antd";
+import { Select, Table, Button, message } from "antd";
 import { NavigationBar } from "../../../shared/navigationBar";
-import { mockEvents } from "../../mockData";
+import { fetchAllEvents, deleteVolunteer } from "../../../../services/api";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function OrganizationHome() {
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [eventsData, setEventsData] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [ddlEvent, setDdlEvent] = React.useState([]);
 
   const handleChange = (selectedValues) => {
-    const newFilteredEvents = mockEvents.filter((event) => {
+    const newFilteredEvents = eventsData.filter((event) => {
       if (selectedValues === undefined || selectedValues.length === 0) {
         return event;
       } else {
-        return selectedValues.includes(capitalize(event.eventName));
+        return selectedValues.includes(capitalize(event.eventName).join(""));
       }
     });
     setFilteredEvents(newFilteredEvents);
   };
 
-  const handleRemove = (eventId, data) => {
-    console.log(eventId, data)
+  const handleRemove = async (eventId, data) => {
+    const response = await deleteVolunteer(eventId, data);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Removed Volunteer from Event!");
+        fetchAllEvents().then((eventData) => {
+          setEventsData(eventData);
+          setFilteredEvents(eventData);
+        });
+      }
+    } catch (error) {
+      message.error(
+        "Unable to remove Volunteer. This may occur due to connection problems. Please try again later."
+      );
+      console.error("Error updating user:", error);
+    }
   };
 
   const capitalize = (data) => {
     return data
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join("");
-  };
-
-  const capitalzeLabel = (data) => {
-    return data
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
+      .map(
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
   };
 
   useEffect(() => {
-    const eventsArray = [
-      ...new Set(mockEvents.map((event) => event.eventName)),
-    ];
-    const createOptions = (array) => {
-      return array.map((item) => ({
-        value: capitalize(item),
-        label: capitalzeLabel(item),
-      }));
-    };
-    setDdlEvent(createOptions(eventsArray));
+    fetchAllEvents().then((eventData) => {
+      const eventsArray = [...new Set(eventData.map((data) => data.eventName))];
+      const createOptions = (array) => {
+        return array.map((item) => ({
+          value: capitalize(item).join(""),
+          label: capitalize(item).join(" "),
+        }));
+      };
+
+      setEventsData(eventData);
+      setFilteredEvents(eventData);
+      setDdlEvent(createOptions(eventsArray));
+    });
   }, []);
 
   const columns = [
@@ -83,21 +96,28 @@ function OrganizationHome() {
     },
   ];
 
-  const dataSource = filteredEvents.flatMap((event) =>
-    event.acceptedVolunteers.map((data, index) => ({
-      key: `${event._id}-${index}`,
-      name: data.firstName + " " + data.lastName,
-      event: event.eventName,
-      email: data.email,
-      contact: data.contact,
-      link: data.link,
-      actions: (
-        <Button type="primary" danger onClick={() => handleRemove(event._id, data)}>
-          Remove
-        </Button>
-      ),
-    }))
-  );
+  const dataSource = filteredEvents.flatMap((event) => {
+    if (event.acceptedVolunteers.length > 0) {
+      return event.acceptedVolunteers.map((data, index) => ({
+        key: `${event._id}-${index}`,
+        name: data.firstName + " " + data.lastName,
+        event: event.eventName,
+        email: data.email,
+        contact: data.contact,
+        link: data.link,
+        actions: (
+          <Button
+            type="primary"
+            danger
+            onClick={() => handleRemove(event._id, data)}
+          >
+            Remove
+          </Button>
+        ),
+      }));
+    }
+    return [];
+  });
 
   return (
     <>
@@ -126,11 +146,18 @@ function OrganizationHome() {
 
         <div className={styles.tableContainer}>
           <h2 className="headerText">Volunteer List:</h2>
-          <Table
-            className="customTable"
-            dataSource={dataSource}
-            columns={columns}
-          />
+          {filteredEvents.length === 0 ? (
+            <div className={styles.loadingDiv}>
+              Loading Volunteers....
+              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+            </div>
+          ) : (
+            <Table
+              className="customTable"
+              dataSource={dataSource}
+              columns={columns}
+            />
+          )}
         </div>
       </div>
     </>

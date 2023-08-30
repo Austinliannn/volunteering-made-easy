@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
-import { Divider, List, Badge, Button } from "antd";
+import { Divider, List, Badge, Button, message } from "antd";
 import NewFormModal from "../../shared/customModalForm";
 import { formSet } from "./config";
 import { fetchUser, updateUser } from "../../../services/api";
@@ -30,10 +30,14 @@ function VolunteerProfile() {
     const response = await updateUser("64e6f3589f09f2395f0cf854", values);
     try {
       if (response.message === "Successful") {
+        message.success("Updated Profile Successfully");
         setIsModalOpen(false);
         fetchuserData();
       }
     } catch (error) {
+      message.error(
+        "Profile could not be updated. This may occur due to a problem connecting to the database. Please try again later."
+      );
       console.error("Error updating user:", error);
     }
   };

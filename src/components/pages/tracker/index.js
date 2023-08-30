@@ -2,67 +2,92 @@ import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
 import { Button, Select, Table } from "antd";
-import { mockAcceptedEvents } from "../mockData";
+import { getAcceptedEvents } from "../../../services/api";
+import { LoadingOutlined } from "@ant-design/icons";
+import { updateCheckIn, updateCheckOut } from "../../../services/api";
 
 function VolunteerTracker() {
-  const [filteredEvents, setFilteredEvents] = useState(mockAcceptedEvents);
+  const [eventData, setEventData] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [toggleCheckIn, setToggleCheckIn] = useState(true);
   const [toggleCheckOut, setToggleCheckOut] = useState(true);
   const [ddlEvent, setDdlEvent] = React.useState([]);
-  const [eventSelected, setEventSelected] = useState("");
 
   const capitalize = (data) => {
     return data
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join("");
-  };
-
-  const capitalzeLabel = (data) => {
-    return data
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
+      .map(
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
   };
 
   useEffect(() => {
-    const eventsArray = [
-      ...new Set(mockAcceptedEvents.map((event) => event.eventId.eventName)),
-    ];
-    const createOptions = (array) => {
-      return array.map((item) => ({
-        value: capitalize(item),
-        label: capitalzeLabel(item),
-      }));
-    };
-    setDdlEvent(createOptions(eventsArray));
+    getAcceptedEvents("64e6f3589f09f2395f0cf854").then((eventsData) => {
+      const eventsArray = [
+        ...new Set(eventsData.map((data) => data.event.eventName)),
+      ];
+
+      const createOptions = (array) => {
+        return array.map((item) => ({
+          value: capitalize(item).join(""),
+          label: capitalize(item).join(" "),
+        }));
+      };
+
+      setEventData(eventsData);
+      setFilteredEvents(eventsData);
+      setDdlEvent(createOptions(eventsArray));
+    });
   }, []);
 
-  const handleChange = (selectedValues) => {
-    setEventSelected(selectedValues);
-    const newFilteredEvents = mockAcceptedEvents.filter((event) => {
-      if (selectedValues === undefined || selectedValues.length === 0) {
-        return event;
-      } else {
-        return selectedValues.includes(capitalize(event.eventId.eventName));
+  const handleChange = async (selectedValues) => {
+    try {
+      if (!selectedValues || selectedValues === "undefined") {
+        setToggleCheckIn(true);
+        setToggleCheckOut(true);
+        const eventsData = await getAcceptedEvents("64e6f3589f09f2395f0cf854");
+        setEventData(eventsData);
+        setFilteredEvents(eventsData);
+        return;
       }
-    });
-    setFilteredEvents(newFilteredEvents);
-    if (filteredEvents.checkInDateTime === undefined)
-    {
-      setToggleCheckIn(false)
-    };
+
+      const newFilteredEvents = eventData.filter((event) => {
+        const isCheckInEmpty = event.checkInDateTime === "";
+        const isCheckOutEmpty = event.checkOutDateTime === "";
+        const selectedEventName = capitalize(event.event.eventName).join("");
+
+        if (selectedValues.includes(selectedEventName)) {
+          if (isCheckInEmpty) {
+            setToggleCheckIn(false);
+            setToggleCheckOut(true);
+          } else if (isCheckOutEmpty) {
+            setToggleCheckIn(true);
+            setToggleCheckOut(false);
+          } else {
+            setToggleCheckIn(true);
+            setToggleCheckOut(true);
+          }
+          return true;
+        }
+        return false;
+      });
+
+      setFilteredEvents(newFilteredEvents);
+    } catch (error) {
+      console.error("Error handling change:", error);
+    }
   };
 
   const handleCheckIn = () => {
     const currentDate = new Date();
     const formattedDate = formatDate(currentDate);
-    const updatedEvents = filteredEvents.map((event) => {
-      return {
-        ...event,
+    const updatedEvents = filteredEvents.map((data) => {
+      const updates = {
+        ...data,
         checkInDateTime: formattedDate,
-        checkOutDateTime: '',
       };
+      updateCheckIn(updates);
+      return updates;
     });
     setFilteredEvents(updatedEvents);
     setToggleCheckIn(true);
@@ -76,12 +101,16 @@ function VolunteerTracker() {
       const checkIn = new Date(data.checkInDateTime);
       const checkOut = new Date(formattedDate);
       const timeDiffMillis = checkOut - checkIn;
-      const totalHours = Math.floor(timeDiffMillis / (1000 * 60 * 60)) + Math.floor(data.totalHours);
-      return {
+      const totalHours =
+        Math.floor(timeDiffMillis / (1000 * 60 * 60)) +
+        Math.floor(data.totalHours);
+      const updates = {
         ...data,
         totalHours: totalHours.toString(),
         checkOutDateTime: formattedDate,
       };
+      updateCheckOut(updates);
+      return updates;
     });
     setFilteredEvents(updatedEvents);
     setToggleCheckIn(false);
@@ -101,8 +130,8 @@ function VolunteerTracker() {
   const columns = [
     {
       title: "Event",
-      dataIndex: "eventId",
-      key: "eventId",
+      dataIndex: "event",
+      key: "event",
     },
     {
       title: "Total Hours",
@@ -120,16 +149,13 @@ function VolunteerTracker() {
       key: "checkOutDateTime",
     },
   ];
-
-  const dataSource = filteredEvents.map((data, index) => {
-    return {
-      key: index,
-      eventId: data.eventId.eventName,
-      totalHours: data.totalHours.toString(),
-      checkInDateTime: data.checkInDateTime,
-      checkOutDateTime: data.checkOutDateTime,
-    };
-  });
+  const dataSource = filteredEvents.map((data, index) => ({
+    key: index,
+    event: data.event.eventName,
+    totalHours: data.totalHours.toString(),
+    checkInDateTime: data.checkInDateTime,
+    checkOutDateTime: data.checkOutDateTime,
+  }));
 
   return (
     <>
@@ -155,41 +181,33 @@ function VolunteerTracker() {
             />
           </div>
           <div className={styles.checkBtn}>
-            {eventSelected === "" && (
-              <>
-                <Button type="primary" disabled={toggleCheckIn} onClick={""}>
-                  Check-In
-                </Button>
-                <Button
-                  type="primary"
-                  disabled={toggleCheckOut}
-                  onClick={""}
-                  className={styles.checkOut}
-                >
-                  Check-Out
-                </Button>
-              </>
-            )}
-            {(eventSelected !== "" && filteredEvents.checkInDateTime === undefined) && (
-              <>
-                <Button type="primary" disabled={toggleCheckIn} onClick={(handleCheckIn)}>
-                  Check-In
-                </Button>
-                <Button
-                  type="primary"
-                  disabled={toggleCheckOut}
-                  onClick={(handleCheckOut)}
-                  className={styles.checkOut}
-                >
-                  Check-Out
-                </Button>
-              </>
-            )}
+            <Button
+              type="primary"
+              disabled={toggleCheckIn}
+              onClick={handleCheckIn}
+            >
+              Check-In
+            </Button>
+            <Button
+              type="primary"
+              disabled={toggleCheckOut}
+              onClick={handleCheckOut}
+              className={styles.checkOut}
+            >
+              Check-Out
+            </Button>
           </div>
         </div>
 
         <div className={styles.tableContainer}>
-          <Table dataSource={dataSource} columns={columns} />
+          {filteredEvents.length === 0 ? (
+            <div className={styles.loadingDiv}>
+              Loading Tracker Events....
+              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+            </div>
+          ) : (
+            <Table dataSource={dataSource} columns={columns} />
+          )}
         </div>
       </div>
     </>

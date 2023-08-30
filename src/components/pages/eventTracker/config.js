@@ -6,6 +6,7 @@ import {
   textAreaField,
   ruleField,
   fileField,
+  skillsOption,
 } from "../../shared/customForm/config";
 
 export const currentEventColumn = [
@@ -108,10 +109,24 @@ export const formSet = [
     dependencies: [],
   },
   {
+    name: "skill",
+    label: "Skills",
+    rule: ruleField(true, "Please input Skills!"),
+    fieldType: selectorField(skillsOption, "multiple"),
+    dependencies: [],
+  },
+  {
     name: "location",
-    label: "Location",
+    label: "Locations",
     rule: ruleField(true, "Please input Location!"),
     fieldType: selectorField(locationsOption, "multiple"),
+    dependencies: [],
+  },
+  {
+    name: "shortDesc",
+    label: "Summary",
+    rule: ruleField(true, "Please input a one sentence Summary!"),
+    fieldType: inputField,
     dependencies: [],
   },
   {
@@ -122,7 +137,7 @@ export const formSet = [
     dependencies: [],
   },
   {
-    name: "eventImage",
+    name: "image",
     label: "Event Image",
     rule: ruleField(false, "Please upload an Image!"),
     fieldType: fileField,

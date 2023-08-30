@@ -19,7 +19,7 @@ const eventSchema = new mongoose.Schema({
     default: [],
   },
   completed: { type: Boolean, required: true },
-  image: { type: String, required: true },
+  image: { type: String, required: false },
   organizationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

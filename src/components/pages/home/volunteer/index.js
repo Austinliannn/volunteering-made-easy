@@ -4,8 +4,9 @@ import { NavigationBar } from "../../../shared/navigationBar";
 import { DropDownSelect } from "../../../shared/dropDownSelect";
 import { CustomCard } from "../../../shared/customCard";
 import { CustomModal } from "../../../shared/customModal";
-import { fetchAllEvents } from "../../../../services/api";
+import { fetchAllEvents, applyEvent } from "../../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
+import { message } from "antd";
 
 function VolunteerHome() {
   const [eventData, setEventData] = useState([]);
@@ -21,7 +22,24 @@ function VolunteerHome() {
     setSelectedModalData(data);
     setIsModalOpen(true);
   };
-  const handleOk = () => setIsModalOpen(false);
+
+  const handleOk = async () => {
+    const response = await applyEvent(
+      selectedModalData,
+      "64e6f3589f09f2395f0cf854"
+    );
+    try {
+      if (response.message === "Successful") {
+        message.success("Application Successfully Sent!");
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      message.error(
+        "Application could not be sent. This may occur if you've already submitted an application for this event or if there was a problem connecting to the database. Please try again later."
+      );
+    }
+  };
+
   const handleCancel = () => setIsModalOpen(false);
 
   const capitalize = (data) => {
@@ -35,7 +53,9 @@ function VolunteerHome() {
   useEffect(() => {
     fetchAllEvents().then((eventsData) => {
       if (eventsData !== undefined) {
-        const causesArray = [...new Set(eventsData.map((event) => event.cause))];
+        const causesArray = [
+          ...new Set(eventsData.map((event) => event.cause)),
+        ];
         const skillsArray = [
           ...new Set(eventsData.flatMap((event) => event.skill)),
         ];
@@ -45,14 +65,14 @@ function VolunteerHome() {
         const availabilitiesArray = [
           ...new Set(eventsData.map((event) => event.startDate)),
         ];
-  
+
         const createOptions = (array) => {
           return array.map((item) => ({
             value: capitalize(item).join(""),
             label: capitalize(item).join(" "),
           }));
         };
-  
+
         setEventData(eventsData);
         setFilteredEvents(eventsData);
         setDdlCauses(createOptions(causesArray));
@@ -149,10 +169,10 @@ function VolunteerHome() {
       <div className={styles.container}>
         <div className={styles.carouselContainer}>
           {filteredEvents.length === 0 ? (
-            <div className={styles.loadingDiv}>
-            Loading Events....
-            <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-          </div>
+            <div className={`${styles.loadingDiv} ${styles.vol}`}>
+              Loading Events....
+              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+            </div>
           ) : (
             filteredEvents.map((data, index) => (
               <div key={index} className={styles.cardDiv}>

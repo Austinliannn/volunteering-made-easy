@@ -42,8 +42,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 90vw;
   height: 25vh;
+}
+
+.vol {
+  width: 90vw;
 }
 
 .topRow {

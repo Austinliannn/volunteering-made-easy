@@ -6,6 +6,13 @@
   flex-wrap: wrap;
 }
 
+.loadingDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 25vh;
+}
+
 .topRow {
   display: flex;
   flex-direction: row;

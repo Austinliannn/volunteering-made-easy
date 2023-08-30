@@ -3,15 +3,13 @@ import { backendApiUrl } from "./config";
 
 export async function registerVolunteers(data) {
   try {
-    const response = await axios.post(
-      backendApiUrl + "/register",
-      { data: data, type: "volunteer" },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(backendApiUrl + "/register", 
+    {data: data, type: "volunteer"},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     console.log("Volunteer registered:", response.data);
   } catch (error) {
     console.error("Volunteer Registration error:", error);
@@ -19,21 +17,49 @@ export async function registerVolunteers(data) {
 }
 
 export async function registerOrganizations(data) {
-    try {
-      const response = await axios.post(
-        backendApiUrl + "/register",
-        { data: data, type: "organization" },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Organization registered:", response.data);
-    } catch (error) {
-      console.error("Organization Registration error:", error);
-    }
+  try {
+    const response = await axios.post(backendApiUrl + "/register", 
+    {data: data, type: "organization"},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Organization registered:", response.data);
+  } catch (error) {
+    console.error("Organization Registration error:", error);
   }
+}
+
+export async function fetchUser(userId) {
+  try {
+    const response = await axios.post(backendApiUrl + "/user", 
+    {userId: userId},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+}
+
+export async function updateUser(userId, data) {
+  try {
+    const response = await axios.put(backendApiUrl + "/updateUser", 
+    {userId: userId, data: data},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+}
 
 export async function fetchAllEvents() {
   try {
@@ -44,36 +70,157 @@ export async function fetchAllEvents() {
   }
 }
 
-export async function fetchUser(userId) {
+export async function applyEvent(data, userId) {
   try {
-    const response = await axios.post(
-      backendApiUrl + "/user",
-      { userId: userId },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(backendApiUrl + "/applyEvent", 
+    {data: data, userId: userId},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error applying to event:", error);
   }
 }
 
-export async function updateUser(userId, data) {
+export async function getAcceptedEvents(userId) {
   try {
-    const response = await axios.put(
-      backendApiUrl + "/updateUser",
-      { userId: userId, data: data },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(backendApiUrl + "/getAcceptedEvents", 
+    {userId: userId},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function updateCheckIn(data) {
+  try {
+    const response = await axios.put(backendApiUrl + "/checkIn", 
+    {data: data},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function updateCheckOut(data) {
+  try {
+    const response = await axios.put(backendApiUrl + "/checkOut", 
+    {data: data},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function deleteVolunteer(eventId, data) {
+  try {
+    const response = await axios.delete(backendApiUrl + "/deleteVolunteer", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        eventId: eventId,
+        data: data,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function deleteApplicant(eventId, data) {
+  try {
+    const response = await axios.delete(backendApiUrl + "/deleteApplicant", 
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        eventId: eventId,
+        data: data,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function addApplicant(eventId, data) {
+  try {
+    const response = await axios.post(backendApiUrl + "/addApplicant", 
+    {eventId: eventId, data: data},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function completeEvent(eventId) {
+  try {
+    const response = await axios.put(backendApiUrl + "/completeEvent", 
+    {eventId: eventId},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function postEvent(data, orgData) {
+  try {
+    const response = await axios.post(backendApiUrl + "/postEvent", 
+    {data: data, orgData: orgData},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+}
+
+export async function updateEvent(data, eventId) {
+  try {
+    const response = await axios.put(backendApiUrl + "/updateEvent", 
+    {data: data, eventId: eventId},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
   }
 }

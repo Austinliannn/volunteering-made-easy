@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
-import { Select, Table, Button } from "antd";
+import { Select, Table, Button, message } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
-import { mockEvents } from "../mockData";
+import {
+  fetchAllEvents,
+  deleteApplicant,
+  addApplicant,
+} from "../../../services/api";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function ApplicantTracker() {
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [eventsData, setEventsData] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [ddlEvent, setDdlEvent] = React.useState([]);
 
   const handleChange = (selectedValues) => {
-    const newFilteredEvents = mockEvents.filter((event) => {
+    const newFilteredEvents = eventsData.filter((event) => {
       if (selectedValues === undefined || selectedValues.length === 0) {
         return event;
       } else {
-        return selectedValues.includes(capitalize(event.eventName));
+        return selectedValues.includes(capitalize(event.eventName).join(""));
       }
     });
     setFilteredEvents(newFilteredEvents);
@@ -22,28 +28,63 @@ function ApplicantTracker() {
   const capitalize = (data) => {
     return data
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join("");
+      .map(
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
   };
 
-  const capitalzeLabel = (data) => {
-    return data
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
+  const handleAdd = async (eventId, data) => {
+    const response = await addApplicant(eventId, data);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Added Applicant to Event!");
+        fetchAllEvents().then((eventData) => {
+          setEventsData(eventData);
+          setFilteredEvents(eventData);
+        });
+      } else{
+        message.error("Volunteer Already Exist!");
+      }
+    } catch (error) {
+      message.error(
+        "Unable to add Applicant. This may occur due to connection problems. Please try again later."
+      );
+      console.error("Error updating user:", error);
+    }
+  };
+
+  const handleRemove = async (eventId, data) => {
+    const response = await deleteApplicant(eventId, data);
+    try {
+      if (response.message === "Successful") {
+        message.success("Successfully Removed Applicant from Event!");
+        fetchAllEvents().then((eventData) => {
+          setEventsData(eventData);
+          setFilteredEvents(eventData);
+        });
+      }
+    } catch (error) {
+      message.error(
+        "Unable to remove Applicant. This may occur due to connection problems. Please try again later."
+      );
+      console.error("Error updating user:", error);
+    }
   };
 
   useEffect(() => {
-    const eventsArray = [
-      ...new Set(mockEvents.map((event) => event.eventName)),
-    ];
-    const createOptions = (array) => {
-      return array.map((item) => ({
-        value: capitalize(item),
-        label: capitalzeLabel(item),
-      }));
-    };
-    setDdlEvent(createOptions(eventsArray));
+    fetchAllEvents().then((eventData) => {
+      const eventsArray = [...new Set(eventData.map((data) => data.eventName))];
+      const createOptions = (array) => {
+        return array.map((item) => ({
+          value: capitalize(item).join(""),
+          label: capitalize(item).join(" "),
+        }));
+      };
+
+      setEventsData(eventData);
+      setFilteredEvents(eventData);
+      setDdlEvent(createOptions(eventsArray));
+    });
   }, []);
 
   const columns = [
@@ -79,26 +120,37 @@ function ApplicantTracker() {
     },
   ];
 
-  const dataSource = filteredEvents.flatMap((event) =>
-    event.applicants.map((data, index) => ({
-      key: `${event._id}-${index}`,
-      name: data.firstName + " " + data.lastName,
-      link: data.link,
-      skill: data.skill.join(", "),
-      email: data.email,
-      contact: data.contact,
-      actions: (
-        <div className="actionsBtn">
-          <Button type="primary" className="addBtn" onClick={() => ""}>
-            +
-          </Button>
-          <Button type="primary" danger onClick={() => ""}>
-            -
-          </Button>
-        </div>
-      ),
-    }))
-  );
+  const dataSource = filteredEvents.flatMap((event) => {
+    if (event.applicants.length > 0) {
+      return event.applicants.map((data, index) => ({
+        key: `${event._id}-${index}`,
+        name: data.firstName + " " + data.lastName,
+        link: data.link,
+        skill: data.skill.join(", "),
+        email: data.email,
+        contact: data.contact,
+        actions: (
+          <div className="actionsBtn">
+            <Button
+              type="primary"
+              className="addBtn"
+              onClick={() => handleAdd(event._id, data)}
+            >
+              +
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => handleRemove(event._id, data)}
+            >
+              -
+            </Button>
+          </div>
+        ),
+      }));
+    }
+    return [];
+  });
 
   return (
     <>
@@ -127,11 +179,18 @@ function ApplicantTracker() {
 
         <div className="tableContainer">
           <h2 className="headerText">Applicant List:</h2>
-          <Table
-            className="customTable"
-            dataSource={dataSource}
-            columns={columns}
-          />
+          {filteredEvents.length === 0 ? (
+            <div className="loadingDiv">
+              Loading Applicants....
+              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
+            </div>
+          ) : (
+            <Table
+              className="customTable"
+              dataSource={dataSource}
+              columns={columns}
+            />
+          )}
         </div>
       </div>
     </>
