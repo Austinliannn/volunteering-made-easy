@@ -1,30 +1,75 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-import { Button, Tabs } from "antd";
+import { Button, Tabs, message } from "antd";
 import { tabItems } from "./config";
 import leavesImage from "../../../assets/leaves.jpg";
 import loginImage from "../../../assets/login-img.jpg";
 import {
   registerVolunteers,
   registerOrganizations,
+  loginUser,
 } from "../../../services/api";
 
 function Login() {
   const [volunteerToggle, setVolunteerToggle] = React.useState(true);
+  const navigate = useNavigate();
 
-  const loginOnFinish = (values) => {
+  const loginOnFinish = async (values) => {
     if (volunteerToggle) {
-      console.log("Volunteer received values of form: ", values);
+      const response = await loginUser(values);
+      try {
+        if (response.message === "Successful") {
+          message.success("Welcome!");
+          navigate("/volunteer");
+        }
+      } catch (error) {
+        message.error("Incorrect Password or Email. Please try again.");
+        console.error("Error updating user:", error);
+      }
     } else {
-      console.log("Organization received values of form: ", values);
+      const response = await loginUser(values);
+      try {
+        if (response.message === "Successful") {
+          message.success("Welcome!");
+          navigate("/organization");
+        }
+      } catch (error) {
+        message.error("Incorrect Password or Email. Please try again.");
+        console.error("Error updating user:", error);
+      }
     }
   };
 
-  const signUpOnFinish = (values) => {
+  const signUpOnFinish = async (values) => {
     if (volunteerToggle) {
-      registerVolunteers(values);
+      const response = await registerVolunteers(values);
+      try {
+        if (response.message === "Successful") {
+          message.success("Successfully Created Account!");
+        } else {
+          message.error("User Already Exist!");
+        }
+      } catch (error) {
+        message.error(
+          "Unable to Create Account. This may occur due to connection problems. Please try again later."
+        );
+        console.error("Error updating user:", error);
+      }
     } else {
-      registerOrganizations(values);
+      const response = await registerOrganizations(values);
+      try {
+        if (response.message === "Successful") {
+          message.success("Successfully Created Account!");
+        } else {
+          message.error("User Already Exist!");
+        }
+      } catch (error) {
+        message.error(
+          "Unable to Create Account. This may occur due to connection problems. Please try again later."
+        );
+        console.error("Error updating user:", error);
+      }
     }
   };
 

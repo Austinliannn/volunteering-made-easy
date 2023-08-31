@@ -3,14 +3,16 @@ import { backendApiUrl } from "./config";
 
 export async function registerVolunteers(data) {
   try {
-    const response = await axios.post(backendApiUrl + "/register", 
-    {data: data, type: "volunteer"},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Volunteer registered:", response.data);
+    const response = await axios.post(
+      backendApiUrl + "/register",
+      { data: data, type: "volunteer" },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
   } catch (error) {
     console.error("Volunteer Registration error:", error);
   }
@@ -18,14 +20,16 @@ export async function registerVolunteers(data) {
 
 export async function registerOrganizations(data) {
   try {
-    const response = await axios.post(backendApiUrl + "/register", 
-    {data: data, type: "organization"},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Organization registered:", response.data);
+    const response = await axios.post(
+      backendApiUrl + "/register",
+      { data: data, type: "organization" },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
   } catch (error) {
     console.error("Organization Registration error:", error);
   }
@@ -33,13 +37,15 @@ export async function registerOrganizations(data) {
 
 export async function fetchUser(userId) {
   try {
-    const response = await axios.post(backendApiUrl + "/user", 
-    {userId: userId},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      backendApiUrl + "/user",
+      { userId: userId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -48,13 +54,15 @@ export async function fetchUser(userId) {
 
 export async function updateUser(userId, data) {
   try {
-    const response = await axios.put(backendApiUrl + "/updateUser", 
-    {userId: userId, data: data},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(
+      backendApiUrl + "/updateUser",
+      { userId: userId, data: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -72,13 +80,15 @@ export async function fetchAllEvents() {
 
 export async function applyEvent(data, userId) {
   try {
-    const response = await axios.post(backendApiUrl + "/applyEvent", 
-    {data: data, userId: userId},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      backendApiUrl + "/applyEvent",
+      { data: data, userId: userId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error applying to event:", error);
@@ -87,13 +97,15 @@ export async function applyEvent(data, userId) {
 
 export async function getAcceptedEvents(userId) {
   try {
-    const response = await axios.post(backendApiUrl + "/getAcceptedEvents", 
-    {userId: userId},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      backendApiUrl + "/getAcceptedEvents",
+      { userId: userId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -102,13 +114,15 @@ export async function getAcceptedEvents(userId) {
 
 export async function updateCheckIn(data) {
   try {
-    const response = await axios.put(backendApiUrl + "/checkIn", 
-    {data: data},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(
+      backendApiUrl + "/checkIn",
+      { data: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -117,13 +131,15 @@ export async function updateCheckIn(data) {
 
 export async function updateCheckOut(data) {
   try {
-    const response = await axios.put(backendApiUrl + "/checkOut", 
-    {data: data},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(
+      backendApiUrl + "/checkOut",
+      { data: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -149,8 +165,7 @@ export async function deleteVolunteer(eventId, data) {
 
 export async function deleteApplicant(eventId, data) {
   try {
-    const response = await axios.delete(backendApiUrl + "/deleteApplicant", 
-    {
+    const response = await axios.delete(backendApiUrl + "/deleteApplicant", {
       headers: {
         "Content-Type": "application/json",
       },
@@ -167,13 +182,15 @@ export async function deleteApplicant(eventId, data) {
 
 export async function addApplicant(eventId, data) {
   try {
-    const response = await axios.post(backendApiUrl + "/addApplicant", 
-    {eventId: eventId, data: data},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      backendApiUrl + "/addApplicant",
+      { eventId: eventId, data: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -182,13 +199,15 @@ export async function addApplicant(eventId, data) {
 
 export async function completeEvent(eventId) {
   try {
-    const response = await axios.put(backendApiUrl + "/completeEvent", 
-    {eventId: eventId},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(
+      backendApiUrl + "/completeEvent",
+      { eventId: eventId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -197,13 +216,15 @@ export async function completeEvent(eventId) {
 
 export async function postEvent(data, orgData) {
   try {
-    const response = await axios.post(backendApiUrl + "/postEvent", 
-    {data: data, orgData: orgData},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      backendApiUrl + "/postEvent",
+      { data: data, orgData: orgData },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -212,15 +233,31 @@ export async function postEvent(data, orgData) {
 
 export async function updateEvent(data, eventId) {
   try {
-    const response = await axios.put(backendApiUrl + "/updateEvent", 
-    {data: data, eventId: eventId},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(
+      backendApiUrl + "/updateEvent",
+      { data: data, eventId: eventId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching events:", error);
+  }
+}
+
+export async function loginUser(data) {
+  try {
+    const response = await axios.post(backendApiUrl + "/login", {
+      email: data.email,
+      password: data.password,
+    });
+    const token = response.data.token;
+    localStorage.setItem("token", token);
+    return response.data;
+  } catch (error) {
+    console.error("Error logging in:", error);
   }
 }
