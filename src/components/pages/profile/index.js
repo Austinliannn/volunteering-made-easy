@@ -8,9 +8,10 @@ import { fetchUser, updateUser } from "../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
 
 function VolunteerProfile() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [profileData, setProfileData] = useState();
   const [eventData, setEventData] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const token = localStorage.getItem('token');
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -19,20 +20,19 @@ function VolunteerProfile() {
     setIsModalOpen(false);
   };
 
-  const fetchuserData = () => {
-    fetchUser("64e6f3589f09f2395f0cf854").then((profData) => {
-      setProfileData(profData.user);
-      setEventData(profData.acceptedEvents);
-    });
+  const fetchUserData = async () => {
+    const response = await fetchUser(token);
+    setProfileData(response.user);
+    setEventData(response.acceptedEvents);
   };
 
   const editOnFinish = async (values) => {
-    const response = await updateUser("64e6f3589f09f2395f0cf854", values);
+    const response = await updateUser(profileData._id, values);
     try {
       if (response.message === "Successful") {
         message.success("Updated Profile Successfully");
         setIsModalOpen(false);
-        fetchuserData();
+        fetchUserData();
       }
     } catch (error) {
       message.error(
@@ -43,7 +43,7 @@ function VolunteerProfile() {
   };
 
   useEffect(() => {
-    fetchuserData();
+    fetchUserData();
   }, []);
 
   return (

@@ -6,7 +6,7 @@ import NewFormModal from "../../shared/customModalForm";
 import { CustomModal } from "../../shared/customModal";
 import { formSet, currentEventColumn, completedEventColumn } from "./config";
 import {
-  fetchAllEvents,
+  fetchEvent,
   completeEvent,
   postEvent,
   fetchUser,
@@ -15,15 +15,22 @@ import {
 import { LoadingOutlined } from "@ant-design/icons";
 
 function EventTracker() {
+  const [orgData, setOrgData] = useState();
   const [eventsData, setEventsData] = useState([]);
   const [editEventId, setEditEventId] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedModalData, setSelectedModalData] = useState(null);
+  const token = localStorage.getItem("token");
 
-  const fetchEvents = () => {
-    fetchAllEvents().then((eventData) => {
+  const fetchOrgData = async () => {
+    const response = await fetchUser(token);
+    setOrgData(response);
+  };
+
+  const fetchEventData = (orgId) => {
+    fetchEvent(orgId).then((eventData) => {
       setEventsData(eventData);
     });
   };
@@ -53,12 +60,11 @@ function EventTracker() {
   };
 
   const addOnFinish = async (values) => {
-    const orgData = await fetchUser("64e6f5d39f09f2395f0cf85d");
     const response = await postEvent(values, orgData);
     try {
       if (response.message === "Successful") {
         message.success("Successfully Posted Event!");
-        fetchEvents();
+        fetchEventData(orgData.user._id);
       }
     } catch (error) {
       message.error(
@@ -73,7 +79,7 @@ function EventTracker() {
     try {
       if (response.message === "Successful") {
         message.success("Successfully Edited Event!");
-        fetchEvents();
+        fetchEventData(orgData.user._id);
       }
     } catch (error) {
       message.error(
@@ -88,7 +94,7 @@ function EventTracker() {
     try {
       if (response.message === "Successful") {
         message.success("Successfully Completed Event! Congratulations!");
-        fetchEvents();
+        fetchEventData(orgData.user._id);
       }
     } catch (error) {
       message.error(
@@ -98,8 +104,12 @@ function EventTracker() {
   };
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (orgData === undefined) {
+      fetchOrgData();
+    } else {
+      fetchEventData(orgData.user._id);
+    }
+  }, [orgData]);
 
   const currentEventDS = eventsData
     .flatMap((event, index) => {
@@ -166,7 +176,14 @@ function EventTracker() {
           <div className={styles.currentList}>
             <div className={styles.headerRow}>
               <div>
-                <h2 className="headerText">Current Events: </h2>
+                <h2 className="headerText">
+                  Current Events:
+                  {orgData === undefined ? (
+                    <LoadingOutlined style={{ fontSize: 25, marginLeft: 10 }} />
+                  ) : (
+                    <></>
+                  )}
+                </h2>
               </div>
               <div>
                 <Button type="primary" onClick={() => showAddModal()}>
@@ -174,35 +191,27 @@ function EventTracker() {
                 </Button>
               </div>
             </div>
-            {eventsData.length === 0 ? (
-              <div className="loadingDiv">
-                Loading Current Events....
-                <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-              </div>
-            ) : (
-              <Table
-                className="customTable"
-                dataSource={currentEventDS}
-                columns={currentEventColumn}
-              />
-            )}
+            <Table
+              className="customTable"
+              dataSource={currentEventDS}
+              columns={currentEventColumn}
+            />
           </div>
 
           <div className={styles.completedList}>
-            <h2 className="headerText">Completed Events: </h2>
-            {eventsData.length === 0 ? (
-              <div className="loadingDiv">
-                Loading Completed Events....
-                <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-              </div>
-            ) : (
-              <div>
-                <Table
-                  dataSource={completedEventDS}
-                  columns={completedEventColumn}
-                />
-              </div>
-            )}
+            <h2 className="headerText">
+              Completed Events:
+              {orgData === undefined ? (
+                <LoadingOutlined style={{ fontSize: 25, marginLeft: 10 }} />
+              ) : (
+                <></>
+              )}
+            </h2>
+            <Table
+              className="customTable"
+              dataSource={completedEventDS}
+              columns={completedEventColumn}
+            />
           </div>
         </div>
       </div>

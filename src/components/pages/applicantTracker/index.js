@@ -3,16 +3,24 @@ import "./styles.css";
 import { Select, Table, Button, message } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
 import {
-  fetchAllEvents,
+  fetchUser,
+  fetchEvent,
   deleteApplicant,
   addApplicant,
 } from "../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
 
 function ApplicantTracker() {
+  const [orgData, setOrgData] = useState();
   const [eventsData, setEventsData] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [ddlEvent, setDdlEvent] = React.useState([]);
+  const token = localStorage.getItem("token");
+
+  const fetchOrgData = async () => {
+    const response = await fetchUser(token);
+    setOrgData(response);
+  };
 
   const handleChange = (selectedValues) => {
     const newFilteredEvents = eventsData.filter((event) => {
@@ -38,11 +46,11 @@ function ApplicantTracker() {
     try {
       if (response.message === "Successful") {
         message.success("Successfully Added Applicant to Event!");
-        fetchAllEvents().then((eventData) => {
+        fetchEvent(orgData.user._id).then((eventData) => {
           setEventsData(eventData);
           setFilteredEvents(eventData);
         });
-      } else{
+      } else {
         message.error("Volunteer Already Exist!");
       }
     } catch (error) {
@@ -58,7 +66,7 @@ function ApplicantTracker() {
     try {
       if (response.message === "Successful") {
         message.success("Successfully Removed Applicant from Event!");
-        fetchAllEvents().then((eventData) => {
+        fetchEvent(orgData.user._id).then((eventData) => {
           setEventsData(eventData);
           setFilteredEvents(eventData);
         });
@@ -72,20 +80,25 @@ function ApplicantTracker() {
   };
 
   useEffect(() => {
-    fetchAllEvents().then((eventData) => {
-      const eventsArray = [...new Set(eventData.map((data) => data.eventName))];
-      const createOptions = (array) => {
-        return array.map((item) => ({
-          value: capitalize(item).join(""),
-          label: capitalize(item).join(" "),
-        }));
-      };
-
-      setEventsData(eventData);
-      setFilteredEvents(eventData);
-      setDdlEvent(createOptions(eventsArray));
-    });
-  }, []);
+    if (orgData === undefined) {
+      fetchOrgData();
+    } else {
+      fetchEvent(orgData.user._id).then((eventData) => {
+        const eventsArray = [
+          ...new Set(eventData.map((data) => data.eventName)),
+        ];
+        const createOptions = (array) => {
+          return array.map((item) => ({
+            value: capitalize(item).join(""),
+            label: capitalize(item).join(" "),
+          }));
+        };
+        setEventsData(eventData);
+        setFilteredEvents(eventData);
+        setDdlEvent(createOptions(eventsArray));
+      });
+    }
+  }, [orgData]);
 
   const columns = [
     {
@@ -178,19 +191,19 @@ function ApplicantTracker() {
         </div>
 
         <div className="tableContainer">
-          <h2 className="headerText">Applicant List:</h2>
-          {filteredEvents.length === 0 ? (
-            <div className="loadingDiv">
-              Loading Applicants....
-              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-            </div>
-          ) : (
-            <Table
-              className="customTable"
-              dataSource={dataSource}
-              columns={columns}
-            />
-          )}
+          <h2 className="headerText">
+            Applicant List:
+            {orgData === undefined ? (
+              <LoadingOutlined style={{ fontSize: 25, marginLeft: 10 }}/>
+            ) : (
+              <></>
+            )}
+          </h2>
+          <Table
+            className="customTable"
+            dataSource={dataSource}
+            columns={columns}
+          />
         </div>
       </div>
     </>

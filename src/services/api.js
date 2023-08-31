@@ -35,20 +35,34 @@ export async function registerOrganizations(data) {
   }
 }
 
-export async function fetchUser(userId) {
+export async function loginUser(data) {
   try {
-    const response = await axios.post(
-      backendApiUrl + "/user",
-      { userId: userId },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(backendApiUrl + "/login", {
+      email: data.email,
+      password: data.password,
+    });
+    const token = response.data.token;
+    localStorage.setItem("token", token);
     return response.data;
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error logging in:", error);
+  }
+}
+
+export async function fetchUser(token) {
+  if(token){
+    try {
+      const response = await axios.get(
+        backendApiUrl + "/getUser",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });  
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   }
 }
 
@@ -72,6 +86,21 @@ export async function updateUser(userId, data) {
 export async function fetchAllEvents() {
   try {
     const response = await axios.get(backendApiUrl + "/events");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Events:", error);
+  }
+}
+
+export async function fetchEvent(orgId) {
+  try {
+    const response = await axios.post(backendApiUrl + "/getEvent",
+    { orgId: orgId },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching Events:", error);
@@ -248,16 +277,3 @@ export async function updateEvent(data, eventId) {
   }
 }
 
-export async function loginUser(data) {
-  try {
-    const response = await axios.post(backendApiUrl + "/login", {
-      email: data.email,
-      password: data.password,
-    });
-    const token = response.data.token;
-    localStorage.setItem("token", token);
-    return response.data;
-  } catch (error) {
-    console.error("Error logging in:", error);
-  }
-}

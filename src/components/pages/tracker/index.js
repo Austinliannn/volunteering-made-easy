@@ -4,14 +4,25 @@ import { NavigationBar } from "../../shared/navigationBar";
 import { Button, Select, Table } from "antd";
 import { getAcceptedEvents } from "../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
-import { updateCheckIn, updateCheckOut } from "../../../services/api";
+import {
+  updateCheckIn,
+  updateCheckOut,
+  fetchUser,
+} from "../../../services/api";
 
 function VolunteerTracker() {
+  const [userData, setUserData] = useState();
   const [eventData, setEventData] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [toggleCheckIn, setToggleCheckIn] = useState(true);
   const [toggleCheckOut, setToggleCheckOut] = useState(true);
   const [ddlEvent, setDdlEvent] = React.useState([]);
+  const token = localStorage.getItem("token");
+
+  const fetchUserData = async () => {
+    const response = await fetchUser(token);
+    setUserData(response);
+  };
 
   const capitalize = (data) => {
     return data
@@ -22,30 +33,37 @@ function VolunteerTracker() {
   };
 
   useEffect(() => {
-    getAcceptedEvents("64e6f3589f09f2395f0cf854").then((eventsData) => {
-      const eventsArray = [
-        ...new Set(eventsData.map((data) => data.event.eventName)),
-      ];
+    if (userData === undefined) {
+      fetchUserData();
+    } else {
+      getAcceptedEvents(userData.user._id).then((eventsData) => {
+        const eventsArray = [
+          ...new Set(eventsData.map((data) => data.event.eventName)),
+        ];
 
-      const createOptions = (array) => {
-        return array.map((item) => ({
-          value: capitalize(item).join(""),
-          label: capitalize(item).join(" "),
-        }));
-      };
+        const createOptions = (array) => {
+          return array.map((item) => ({
+            value: capitalize(item).join(""),
+            label: capitalize(item).join(" "),
+          }));
+        };
 
-      setEventData(eventsData);
-      setFilteredEvents(eventsData);
-      setDdlEvent(createOptions(eventsArray));
-    });
-  }, []);
+        setEventData(eventsData);
+        setFilteredEvents(eventsData);
+        setDdlEvent(createOptions(eventsArray));
+      });
+    }
+  }, [userData]);
 
   const handleChange = async (selectedValues) => {
     try {
-      if (!selectedValues || selectedValues === "undefined") {
+      if (
+        (!selectedValues || selectedValues === "undefined") &&
+        userData !== undefined
+      ) {
         setToggleCheckIn(true);
         setToggleCheckOut(true);
-        const eventsData = await getAcceptedEvents("64e6f3589f09f2395f0cf854");
+        const eventsData = await getAcceptedEvents(userData.user._id);
         setEventData(eventsData);
         setFilteredEvents(eventsData);
         return;
@@ -200,7 +218,7 @@ function VolunteerTracker() {
         </div>
 
         <div className={styles.tableContainer}>
-          {filteredEvents.length === 0 ? (
+          {userData === undefined ? (
             <div className={styles.loadingDiv}>
               Loading Tracker Events....
               <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />

@@ -4,11 +4,12 @@ import { NavigationBar } from "../../../shared/navigationBar";
 import { DropDownSelect } from "../../../shared/dropDownSelect";
 import { CustomCard } from "../../../shared/customCard";
 import { CustomModal } from "../../../shared/customModal";
-import { fetchAllEvents, applyEvent } from "../../../../services/api";
+import { fetchAllEvents, applyEvent, fetchUser } from "../../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
 import { message } from "antd";
 
 function VolunteerHome() {
+  const [userData, setUserData] = useState();
   const [eventData, setEventData] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [ddlCauses, setDdlCauses] = useState([]);
@@ -17,6 +18,12 @@ function VolunteerHome() {
   const [ddlAvailability, setDdlAvailability] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedModalData, setSelectedModalData] = useState(null);
+  const token = localStorage.getItem('token');
+
+  const fetchUserData = async () => {
+    const response = await fetchUser(token);
+    setUserData(response);
+  };
 
   const showModal = (data) => {
     setSelectedModalData(data);
@@ -26,7 +33,7 @@ function VolunteerHome() {
   const handleOk = async () => {
     const response = await applyEvent(
       selectedModalData,
-      "64e6f3589f09f2395f0cf854"
+      userData.user._id,
     );
     try {
       if (response.message === "Successful") {
@@ -49,8 +56,9 @@ function VolunteerHome() {
         (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       );
   };
-
+  
   useEffect(() => {
+    fetchUserData();
     fetchAllEvents().then((eventsData) => {
       if (eventsData !== undefined) {
         const causesArray = [

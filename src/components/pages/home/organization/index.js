@@ -2,13 +2,24 @@ import React, { useState, useEffect } from "react";
 import styles from "../styles.module.css";
 import { Select, Table, Button, message } from "antd";
 import { NavigationBar } from "../../../shared/navigationBar";
-import { fetchAllEvents, deleteVolunteer } from "../../../../services/api";
+import {
+  deleteVolunteer,
+  fetchUser,
+  fetchEvent,
+} from "../../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
 
 function OrganizationHome() {
-  const [eventsData, setEventsData] = useState([]);
+  const [orgData, setOrgData] = useState();
+  const [eventsData, setEventsData] = useState(-1);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [ddlEvent, setDdlEvent] = React.useState([]);
+  const token = localStorage.getItem("token");
+
+  const fetchOrgData = async () => {
+    const response = await fetchUser(token);
+    setOrgData(response);
+  };
 
   const handleChange = (selectedValues) => {
     const newFilteredEvents = eventsData.filter((event) => {
@@ -26,7 +37,7 @@ function OrganizationHome() {
     try {
       if (response.message === "Successful") {
         message.success("Successfully Removed Volunteer from Event!");
-        fetchAllEvents().then((eventData) => {
+        fetchEvent(orgData.user._id).then((eventData) => {
           setEventsData(eventData);
           setFilteredEvents(eventData);
         });
@@ -48,20 +59,25 @@ function OrganizationHome() {
   };
 
   useEffect(() => {
-    fetchAllEvents().then((eventData) => {
-      const eventsArray = [...new Set(eventData.map((data) => data.eventName))];
-      const createOptions = (array) => {
-        return array.map((item) => ({
-          value: capitalize(item).join(""),
-          label: capitalize(item).join(" "),
-        }));
-      };
-
-      setEventsData(eventData);
-      setFilteredEvents(eventData);
-      setDdlEvent(createOptions(eventsArray));
-    });
-  }, []);
+    if (orgData === undefined) {
+      fetchOrgData();
+    } else {
+      fetchEvent(orgData.user._id).then((eventData) => {
+        const eventsArray = [
+          ...new Set(eventData.map((data) => data.eventName)),
+        ];
+        const createOptions = (array) => {
+          return array.map((item) => ({
+            value: capitalize(item).join(""),
+            label: capitalize(item).join(" "),
+          }));
+        };
+        setEventsData(eventData);
+        setFilteredEvents(eventData);
+        setDdlEvent(createOptions(eventsArray));
+      });
+    }
+  }, [orgData]);
 
   const columns = [
     {
@@ -145,19 +161,19 @@ function OrganizationHome() {
         </div>
 
         <div className={styles.tableContainer}>
-          <h2 className="headerText">Volunteer List:</h2>
-          {filteredEvents.length === 0 ? (
-            <div className={styles.loadingDiv}>
-              Loading Volunteers....
-              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-            </div>
-          ) : (
-            <Table
-              className="customTable"
-              dataSource={dataSource}
-              columns={columns}
-            />
-          )}
+          <h2 className="headerText">
+            Volunteer List:
+            {orgData === undefined ? (
+              <LoadingOutlined style={{ fontSize: 25, marginLeft: 10 }} />
+            ) : (
+              <></>
+            )}
+          </h2>
+          <Table
+            className="customTable"
+            dataSource={dataSource}
+            columns={columns}
+          />
         </div>
       </div>
     </>

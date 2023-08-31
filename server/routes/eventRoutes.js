@@ -4,6 +4,7 @@ const eventController = require('../controller/eventController');
 const router = express.Router();
 
 router.get('/events', eventController.getAllEvents);
+router.post('/getEvent', eventController.getEvent);
 router.post('/applyEvent', eventController.applyEvent);
 router.post('/getAcceptedEvents', eventController.getAcceptedEvents);
 router.put('/checkIn', eventController.checkIn);

@@ -1,14 +1,19 @@
 const User = require("../models/userModel");
 const Event = require("../models/eventModel");
+const jwt = require('jsonwebtoken');
 
 async function getUser(req, res) {
   try {
-    const user = await User.findById(req.body.userId);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'Volunt33ringM@d3Easy');
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
     const acceptedEvents = await Event.find({
-      acceptedVolunteers: req.body.userId,
+      acceptedVolunteers: userId,
     });
     res.json({
       user: user,

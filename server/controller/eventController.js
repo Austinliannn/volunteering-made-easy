@@ -14,6 +14,20 @@ async function getAllEvents(req, res) {
   }
 }
 
+async function getEvent(req, res) {
+  try {
+    const events = await Event.find({ organizationId: req.body.orgId })
+      .populate("organizationId")
+      .populate("applicants")
+      .populate("acceptedVolunteers")
+      .exec();
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 async function applyEvent(req, res) {
   try {
     const event = await Event.findById(req.body.data._id);
@@ -121,6 +135,10 @@ async function addApplicant(req, res) {
       );
       event.acceptedVolunteers.push(req.body.data._id);
       await event.save();
+
+      //NEED TO ADD A NEW EVENT AT THE ACCEPTEDEVENTS DB FOR THE TRACKER
+
+
       res.json({ message: "Successful" });
     } else {
       res.json({ message: "Volunteer already exists" });
@@ -201,6 +219,7 @@ async function updateEvent(req, res) {
 
 module.exports = {
   getAllEvents,
+  getEvent,
   applyEvent,
   getAcceptedEvents,
   checkIn,
