@@ -41,35 +41,39 @@ function Login() {
     }
   };
 
-  const signUpOnFinish = async (values) => {
-    if (volunteerToggle) {
-      const response = await registerVolunteers(values);
-      try {
-        if (response.message === "Successful") {
-          message.success("Successfully Created Account!");
-        } else {
-          message.error("User Already Exist!");
+  const signUpOnFinish = async (values, file) => {
+    if (values.password === values.confirm) {
+      if (volunteerToggle) {
+        const response = await registerVolunteers(values, file);
+        try {
+          if (response.message === "Successful") {
+            message.success("Successfully Created Account!");
+          } else {
+            message.error("User Already Exist!");
+          }
+        } catch (error) {
+          message.error(
+            "Unable to Create Account. This may occur due to connection problems. Please try again later."
+          );
+          console.error("Error updating user:", error);
         }
-      } catch (error) {
-        message.error(
-          "Unable to Create Account. This may occur due to connection problems. Please try again later."
-        );
-        console.error("Error updating user:", error);
+      } else {
+        const response = await registerOrganizations(values, file);
+        try {
+          if (response.message === "Successful") {
+            message.success("Successfully Created Account!");
+          } else {
+            message.error("User Already Exist!");
+          }
+        } catch (error) {
+          message.error(
+            "Unable to Create Account. This may occur due to connection problems. Please try again later."
+          );
+          console.error("Error updating user:", error);
+        }
       }
     } else {
-      const response = await registerOrganizations(values);
-      try {
-        if (response.message === "Successful") {
-          message.success("Successfully Created Account!");
-        } else {
-          message.error("User Already Exist!");
-        }
-      } catch (error) {
-        message.error(
-          "Unable to Create Account. This may occur due to connection problems. Please try again later."
-        );
-        console.error("Error updating user:", error);
-      }
+      message.error("Unable to Create Account. Password and Confirm Password do not match. Please check again.");
     }
   };
 

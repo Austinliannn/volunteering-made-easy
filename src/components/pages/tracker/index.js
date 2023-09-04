@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
 import { Button, Select, Table } from "antd";
@@ -19,10 +19,10 @@ function VolunteerTracker() {
   const [ddlEvent, setDdlEvent] = React.useState([]);
   const token = localStorage.getItem("token");
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     const response = await fetchUser(token);
     setUserData(response);
-  };
+  }, [token]);
 
   const capitalize = (data) => {
     return data
@@ -53,7 +53,7 @@ function VolunteerTracker() {
         setDdlEvent(createOptions(eventsArray));
       });
     }
-  }, [userData]);
+  }, [userData, fetchUserData]);
 
   const handleChange = async (selectedValues) => {
     try {
@@ -74,11 +74,13 @@ function VolunteerTracker() {
         const isCheckOutEmpty = event.checkOutDateTime === "";
         const selectedEventName = capitalize(event.event.eventName).join("");
 
+        console.log(event.event.completed)
+
         if (selectedValues.includes(selectedEventName)) {
-          if (isCheckInEmpty) {
+          if (isCheckInEmpty && event.event.completed === false) {
             setToggleCheckIn(false);
             setToggleCheckOut(true);
-          } else if (isCheckOutEmpty) {
+          } else if (isCheckOutEmpty && event.event.completed === false) {
             setToggleCheckIn(true);
             setToggleCheckOut(false);
           } else {

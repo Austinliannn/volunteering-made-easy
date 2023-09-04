@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./styles.module.css";
 import { Table, Button, message } from "antd";
 import { NavigationBar } from "../../shared/navigationBar";
@@ -24,10 +24,20 @@ function EventTracker() {
   const [selectedModalData, setSelectedModalData] = useState(null);
   const token = localStorage.getItem("token");
 
-  const fetchOrgData = async () => {
+  function DisplayImage({ contentType, data }) {
+    const blob = new Blob([new Uint8Array(data.data)], { type: contentType });
+    const imageUrl = URL.createObjectURL(blob);
+    return imageUrl;
+  }
+
+  const fetchOrgData = useCallback( async () => {
     const response = await fetchUser(token);
-    setOrgData(response);
-  };
+    const imageUrl = DisplayImage({
+      contentType: response.user.image.contentType,
+      data: response.user.image.data,
+    });
+    setOrgData({...response, user: { ...response.user, image: imageUrl}});
+  },[token]);
 
   const fetchEventData = (orgId) => {
     fetchEvent(orgId).then((eventData) => {
@@ -52,15 +62,19 @@ function EventTracker() {
   };
 
   const showViewModal = (data) => {
-    setSelectedModalData(data);
+    const imageUrl = DisplayImage({
+      contentType: data.image.contentType,
+      data: data.image.data,
+    });
+    setSelectedModalData({...data, image: imageUrl});
     setIsViewModalOpen(true);
   };
   const handleViewCancel = () => {
     setIsViewModalOpen(false);
   };
 
-  const addOnFinish = async (values) => {
-    const response = await postEvent(values, orgData);
+  const addOnFinish = async (values, file) => {
+    const response = await postEvent(values, orgData, file);
     try {
       if (response.message === "Successful") {
         message.success("Successfully Posted Event!");
@@ -74,8 +88,8 @@ function EventTracker() {
     setIsAddModalOpen(false);
   };
 
-  const editOnFinish = async (values) => {
-    const response = await updateEvent(values, editEventId);
+  const editOnFinish = async (values, file) => {
+    const response = await updateEvent(values, editEventId, file);
     try {
       if (response.message === "Successful") {
         message.success("Successfully Edited Event!");
@@ -109,7 +123,7 @@ function EventTracker() {
     } else {
       fetchEventData(orgData.user._id);
     }
-  }, [orgData]);
+  }, [orgData, fetchOrgData]);
 
   const currentEventDS = eventsData
     .flatMap((event, index) => {

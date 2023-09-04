@@ -4,26 +4,29 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res) {
-  const email = req.body.data.email;
+  const email = req.query.data.email;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "Email already registered" });
     }
-    const hashedPassword = await bcrypt.hash(req.body.data.password, 10);
+    const hashedPassword = await bcrypt.hash(req.query.data.password, 10);
     const newUser = new User({
-      email: req.body.data.email,
+      email: email,
       password: hashedPassword,
-      firstName: req.body.data.firstName,
-      lastName: req.body.data.lastName,
-      organizationName: req.body.data.organizationName,
-      contact: req.body.data.contact,
-      link: req.body.data.link,
-      address: req.body.data.address,
-      skill: req.body.data.skill,
-      location: req.body.data.location,
-      image: req.body.data.image,
-      type: req.body.type,
+      firstName: req.query.data.firstName,
+      lastName: req.query.data.lastName,
+      organizationName: req.query.data.organizationName,
+      contact: req.query.data.contact,
+      link: req.query.data.link,
+      address: req.query.data.address,
+      skill: req.query.data.skill,
+      location: req.query.data.location,
+      image: {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      },
+      type: req.query.type,
     });
     await newUser.save();
     res.json({ message: "Successful" });

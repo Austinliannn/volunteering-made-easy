@@ -3,7 +3,10 @@ const AcceptedEvent = require("../models/acceptedEventModel");
 
 async function getAllEvents(req, res) {
   try {
-    const events = await Event.find()
+    const events = await Event.find({
+      applicants: { $nin: [req.body.userId] },
+      acceptedVolunteers: { $nin: [req.body.userId] },
+    })
       .populate("organizationId")
       .populate("applicants")
       .populate("acceptedVolunteers")
@@ -134,11 +137,16 @@ async function addApplicant(req, res) {
         (applicant) => applicant.toString() !== req.body.data._id
       );
       event.acceptedVolunteers.push(req.body.data._id);
+      const newAcceptedEvent = new AcceptedEvent({
+        user: req.body.data._id,
+        event: req.body.eventId,
+        totalHours: 0,
+        checkInDateTime: "",
+        checkOutDateTime: "",
+      });
+
       await event.save();
-
-      //NEED TO ADD A NEW EVENT AT THE ACCEPTEDEVENTS DB FOR THE TRACKER
-
-
+      await newAcceptedEvent.save();
       res.json({ message: "Successful" });
     } else {
       res.json({ message: "Volunteer already exists" });
@@ -165,51 +173,59 @@ async function completeEvent(req, res) {
 }
 
 async function postEvent(req, res) {
-try {
-  const newEvent = new Event({
-    eventName: req.body.data.eventName,
-    cause: req.body.data.cause,
-    shortDesc: req.body.data.shortDesc,
-    description: req.body.data.description,
-    startDate: req.body.data.startDate,
-    endDate: req.body.data.endDate,
-    inCharge: req.body.data.inCharge,
-    contact: req.body.data.contact,
-    skill: req.body.data.skill,
-    location: req.body.data.location,
-    completed: false,
-    image: req.body.data.image,
-    organizationId: req.body.orgData.user._id,
-    applicants: [],
-    acceptedVolunteers: [],
-  });
-  await newEvent.save();
-  res.status(201).json({ message: "Successful" });
-} catch (error) {
-  console.error("Post Event error:", error);
-  res.status(500).json({ message: "Internal server error" });
-}
+  try {
+    const newEvent = new Event({
+      eventName: req.query.data.eventName,
+      cause: req.query.data.cause,
+      shortDesc: req.query.data.shortDesc,
+      description: req.query.data.description,
+      startDate: req.query.data.startDate,
+      endDate: req.query.data.endDate,
+      inCharge: req.query.data.inCharge,
+      contact: req.query.data.contact,
+      skill: req.query.data.skill,
+      location: req.query.data.location,
+      completed: false,
+      image: {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      },
+      organizationId: req.query.orgData.user._id,
+      applicants: [],
+      acceptedVolunteers: [],
+    });
+    await newEvent.save();
+    res.status(201).json({ message: "Successful" });
+  } catch (error) {
+    console.error("Post Event error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 async function updateEvent(req, res) {
+  console.log(req.query);
+  console.log(req.file);
+
   try {
-    const event = await Event.findById(req.body.eventId);
+    const event = await Event.findById(req.query.eventId);
     if (!event) {
       return res.status(404).json({ error: "Event not found" });
     }
-
-    event.eventName = req.body.data.eventName,
-    event.cause = req.body.data.cause,
-    event.shortDesc = req.body.data.shortDesc,
-    event.description = req.body.data.description,
-    event.startDate = req.body.data.startDate,
-    event.endDate = req.body.data.endDate,
-    event.inCharge = req.body.data.inCharge,
-    event.contact = req.body.data.contact,
-    event.skill = req.body.data.skill,
-    event.location = req.body.data.location,
-    event.image = req.body.data.image,
-    await event.save();
+    (event.eventName = req.query.data.eventName),
+      (event.cause = req.query.data.cause),
+      (event.shortDesc = req.query.data.shortDesc),
+      (event.description = req.query.data.description),
+      (event.startDate = req.query.data.startDate),
+      (event.endDate = req.query.data.endDate),
+      (event.inCharge = req.query.data.inCharge),
+      (event.contact = req.query.data.contact),
+      (event.skill = req.query.data.skill),
+      (event.location = req.query.data.location),
+      (event.image = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      }),
+      await event.save();
     res.json({ message: "Successful" });
   } catch (error) {
     console.error("Error updating user profile:", error);

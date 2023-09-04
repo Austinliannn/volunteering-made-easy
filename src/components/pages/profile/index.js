@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./styles.module.css";
 import { NavigationBar } from "../../shared/navigationBar";
 import { Divider, List, Badge, Button, message } from "antd";
@@ -11,7 +11,7 @@ function VolunteerProfile() {
   const [profileData, setProfileData] = useState();
   const [eventData, setEventData] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -20,14 +20,24 @@ function VolunteerProfile() {
     setIsModalOpen(false);
   };
 
-  const fetchUserData = async () => {
-    const response = await fetchUser(token);
-    setProfileData(response.user);
-    setEventData(response.acceptedEvents);
-  };
+  function DisplayImage({ contentType, data }) {
+    const blob = new Blob([new Uint8Array(data.data)], { type: contentType });
+    const imageUrl = URL.createObjectURL(blob);
+    return imageUrl;
+  }
 
-  const editOnFinish = async (values) => {
-    const response = await updateUser(profileData._id, values);
+  const fetchUserData = useCallback(async () => {
+    const response = await fetchUser(token);
+    const imageUrl = DisplayImage({
+      contentType: response.user.image.contentType,
+      data: response.user.image.data,
+    });
+    setProfileData({ ...response.user, image: imageUrl });
+    setEventData(response.acceptedEvents);
+  }, [token]);
+
+  const editOnFinish = async (values, file) => {
+    const response = await updateUser(profileData._id, values, file);
     try {
       if (response.message === "Successful") {
         message.success("Updated Profile Successfully");
@@ -43,8 +53,10 @@ function VolunteerProfile() {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if(profileData === undefined){
+      fetchUserData();
+    }
+  }, [profileData, fetchUserData]);
 
   return (
     <>

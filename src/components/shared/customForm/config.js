@@ -85,7 +85,8 @@ export const ruleField = (required, message, type, typeMessage) => {
 };
 
 export const fileField = {
-  name: "input",
+  name: "image",
   type: "file",
   option: [],
+  accept: "image/*",
 };

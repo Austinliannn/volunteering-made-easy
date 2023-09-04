@@ -81,7 +81,7 @@ export const volunteerFormSet = [
   {
     name: "image",
     label: "Upload Image",
-    rule: ruleField(false, "Please Upload an Image!"),
+    rule: ruleField(true, "Please Upload an Image!"),
     fieldType: fileField,
     dependencies: [],
   },
@@ -145,7 +145,7 @@ export const organizationFormSet = [
   {
     name: "image",
     label: "Upload Image",
-    rule: ruleField(false, "Please Upload an Image!"),
+    rule: ruleField(true, "Please Upload an Image!"),
     fieldType: fileField,
     dependencies: [],
   },

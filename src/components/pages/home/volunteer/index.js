@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "../styles.module.css";
 import { NavigationBar } from "../../../shared/navigationBar";
 import { DropDownSelect } from "../../../shared/dropDownSelect";
 import { CustomCard } from "../../../shared/customCard";
 import { CustomModal } from "../../../shared/customModal";
-import { fetchAllEvents, applyEvent, fetchUser } from "../../../../services/api";
+import {
+  fetchAllEvents,
+  applyEvent,
+  fetchUser,
+} from "../../../../services/api";
 import { LoadingOutlined } from "@ant-design/icons";
 import { message } from "antd";
 
@@ -18,27 +22,38 @@ function VolunteerHome() {
   const [ddlAvailability, setDdlAvailability] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedModalData, setSelectedModalData] = useState(null);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
-  const fetchUserData = async () => {
+  function DisplayImage({ contentType, data }) {
+    const blob = new Blob([new Uint8Array(data.data)], { type: contentType });
+    const imageUrl = URL.createObjectURL(blob);
+    return imageUrl;
+  }
+
+  const fetchUserData = useCallback(async () => {
     const response = await fetchUser(token);
     setUserData(response);
-  };
+  }, [token]);
 
   const showModal = (data) => {
-    setSelectedModalData(data);
+    const imageUrl = DisplayImage({
+      contentType: data.image.contentType,
+      data: data.image.data,
+    });
+    setSelectedModalData({...data, image: imageUrl});
     setIsModalOpen(true);
   };
 
   const handleOk = async () => {
-    const response = await applyEvent(
-      selectedModalData,
-      userData.user._id,
-    );
+    const response = await applyEvent(selectedModalData, userData.user._id);
     try {
       if (response.message === "Successful") {
         message.success("Application Successfully Sent!");
         setIsModalOpen(false);
+        fetchAllEvents(userData.user._id).then((eventsData) => {
+          setEventData(eventsData);
+          setFilteredEvents(eventsData);
+        });
       }
     } catch (error) {
       message.error(
@@ -56,40 +71,43 @@ function VolunteerHome() {
         (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       );
   };
-  
+
   useEffect(() => {
-    fetchUserData();
-    fetchAllEvents().then((eventsData) => {
-      if (eventsData !== undefined) {
-        const causesArray = [
-          ...new Set(eventsData.map((event) => event.cause)),
-        ];
-        const skillsArray = [
-          ...new Set(eventsData.flatMap((event) => event.skill)),
-        ];
-        const locationsArray = [
-          ...new Set(eventsData.flatMap((event) => event.location)),
-        ];
-        const availabilitiesArray = [
-          ...new Set(eventsData.map((event) => event.startDate)),
-        ];
+    if (userData === undefined) {
+      fetchUserData();
+    } else {
+      fetchAllEvents(userData.user._id).then((eventsData) => {
+        if (eventsData !== undefined) {
+          const causesArray = [
+            ...new Set(eventsData.map((event) => event.cause)),
+          ];
+          const skillsArray = [
+            ...new Set(eventsData.flatMap((event) => event.skill)),
+          ];
+          const locationsArray = [
+            ...new Set(eventsData.flatMap((event) => event.location)),
+          ];
+          const availabilitiesArray = [
+            ...new Set(eventsData.map((event) => event.startDate)),
+          ];
 
-        const createOptions = (array) => {
-          return array.map((item) => ({
-            value: capitalize(item).join(""),
-            label: capitalize(item).join(" "),
-          }));
-        };
+          const createOptions = (array) => {
+            return array.map((item) => ({
+              value: capitalize(item).join(""),
+              label: capitalize(item).join(" "),
+            }));
+          };
 
-        setEventData(eventsData);
-        setFilteredEvents(eventsData);
-        setDdlCauses(createOptions(causesArray));
-        setDdlSkills(createOptions(skillsArray));
-        setDdlLocations(createOptions(locationsArray));
-        setDdlAvailability(createOptions(availabilitiesArray));
-      }
-    });
-  }, []);
+          setEventData(eventsData);
+          setFilteredEvents(eventsData);
+          setDdlCauses(createOptions(causesArray));
+          setDdlSkills(createOptions(skillsArray));
+          setDdlLocations(createOptions(locationsArray));
+          setDdlAvailability(createOptions(availabilitiesArray));
+        }
+      });
+    }
+  }, [userData, fetchUserData]);
 
   const handleFilterChange = (title, selectedValues) => {
     const newFilteredEvents = eventData.filter((event) => {
@@ -171,23 +189,30 @@ function VolunteerHome() {
       </div>
 
       <div className={styles.container}>
-        <h2 className={styles.title}>List of Opportunities</h2>
+        <h2 className={styles.title}>
+          List of Opportunities
+          {userData === undefined ? (
+            <LoadingOutlined style={{ fontSize: 25, marginLeft: 10 }} />
+          ) : (
+            ""
+          )}
+        </h2>
       </div>
 
       <div className={styles.container}>
         <div className={styles.carouselContainer}>
-          {filteredEvents.length === 0 ? (
-            <div className={`${styles.loadingDiv} ${styles.vol}`}>
-              Loading Events....
-              <LoadingOutlined style={{ fontSize: 40, marginLeft: 10 }} />
-            </div>
-          ) : (
-            filteredEvents.map((data, index) => (
-              <div key={index} className={styles.cardDiv}>
-                <CustomCard data={data} onClick={() => showModal(data)} />
-              </div>
-            ))
-          )}
+          <div className={styles.cardDiv}>
+            {filteredEvents.length !== 0
+              ? filteredEvents.map((data, index) => (
+                  <CustomCard
+                    key={index}
+                    data={data}
+                    onClick={() => showModal(data)}
+                  />
+                ))
+              : "There are no events posted at the moment, Please refresh and try again later."}
+          </div>
+
           <CustomModal
             data={selectedModalData}
             isModalOpen={isModalOpen}

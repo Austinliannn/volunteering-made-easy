@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "../styles.module.css";
 import { Select, Table, Button, message } from "antd";
 import { NavigationBar } from "../../../shared/navigationBar";
@@ -16,10 +16,10 @@ function OrganizationHome() {
   const [ddlEvent, setDdlEvent] = React.useState([]);
   const token = localStorage.getItem("token");
 
-  const fetchOrgData = async () => {
+  const fetchOrgData = useCallback(async () => {
     const response = await fetchUser(token);
     setOrgData(response);
-  };
+  }, [token]);
 
   const handleChange = (selectedValues) => {
     const newFilteredEvents = eventsData.filter((event) => {
@@ -77,7 +77,7 @@ function OrganizationHome() {
         setDdlEvent(createOptions(eventsArray));
       });
     }
-  }, [orgData]);
+  }, [orgData, fetchOrgData]);
 
   const columns = [
     {

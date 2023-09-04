@@ -27,17 +27,21 @@ async function getUser(req, res) {
 
 async function updateUser(req, res) {
   try {
-    const user = await User.findById(req.body.userId);
+    const user = await User.findById(req.query.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    user.firstName = req.body.data.firstName;
-    user.lastName = req.body.data.lastName;
-    user.contact = req.body.data.contact;
-    user.link = req.body.data.link;
-    user.skill = req.body.data.skill;
-    user.location = req.body.data.location;
-    user.image = req.body.data.image;
+    user.firstName = req.query.data.firstName;
+    user.lastName = req.query.data.lastName;
+    user.contact = req.query.data.contact;
+    user.link = req.query.data.link;
+    user.skill = req.query.data.skill;
+    user.location = req.query.data.location;
+    user.image = req.file;
+    user.image = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+    },
     await user.save();
     res.json({ message: "Successful" });
   } catch (error) {

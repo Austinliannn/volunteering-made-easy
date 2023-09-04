@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, Select } from "antd";
 import styles from "./styles.module.css";
 const { Option } = Select;
 
-function NewForm({ name, onFinish, formSet, submitText}) {
+function NewForm({ name, onFinish, formSet, submitText }) {
   const [form] = Form.useForm();
+  const [file, setFile] = useState(null);
   const { TextArea } = Input;
 
   return (
     <Form
       form={form}
       name={name}
-      onFinish={onFinish}
+      onFinish={(values) => onFinish(values, file)}
       scrollToFirstError
       className={styles.tabContent}
     >
@@ -30,8 +31,22 @@ function NewForm({ name, onFinish, formSet, submitText}) {
             ) : (
               ""
             )}
+            {data.fieldType.name === "image" ? (
+              <Input
+                name={data.fieldType.name}
+                type='file'
+                id={data.label}
+                accept={data.fieldType.accept}
+                onChange={(event) => {
+                  const file = event.currentTarget.files[0];
+                  setFile(file);
+                }}
+              />
+            ) : (
+              ""
+            )}
             {data.fieldType.name === "inputPassword" ? (
-              <Input.Password id={data.label}/>
+              <Input.Password id={data.label} />
             ) : (
               ""
             )}
