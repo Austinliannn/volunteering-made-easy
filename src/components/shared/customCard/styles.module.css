@@ -1,5 +1,6 @@
 .cardTitle {
     width: 16vw;
+    height: 30vh;
 }
 
 .badgeStyle {
@@ -9,5 +10,6 @@
 @media screen and (max-width: 820px) {
     .cardTitle {
         width: 80vw;
+        height: 39vh;
     }
 }
