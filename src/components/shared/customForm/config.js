@@ -1,45 +1,157 @@
 export const causesOption = [
   {
-    value: "cause1",
-    label: "Cause 1",
+    value: "humanRights",
+    label: "Human Rights",
   },
   {
-    value: "cause2",
-    label: "Cause 2",
+    value: "animals",
+    label: "Animals",
   },
   {
-    value: "cause3",
-    label: "Cause 3",
+    value: "culture",
+    label: "Culture",
   },
+  {
+    value: "youth",
+    label: "Youth",
+  },
+  {
+    value: "community",
+    label: "Community",
+  },
+  {
+    value: "technology",
+    label: "Technology",
+  },
+  {
+    value: "education",
+    label: "Education",
+  },
+  {
+    value: "medical",
+    label: "Medical",
+  },
+  {
+    value: "seniors",
+    label: "Seniors",
+  }
 ];
 
 export const locationsOption = [
   {
-    value: "location1",
-    label: "Location 1",
+    value: "orchard",
+    label: "Orchard",
   },
   {
-    value: "location2",
-    label: "Location 2",
+    value: "littleIndia",
+    label: "Little India",
   },
   {
-    value: "location3",
-    label: "Location 3",
+    value: "bukitMerah",
+    label: "Bukit Merah",
+  },
+  {
+    value: "marinaBay",
+    label: "Marina Bay",
+  },
+  {
+    value: "tanglin",
+    label: "Tanglin",
+  },
+  {
+    value: "bukitPanjang",
+    label: "Bukit Panjang",
+  },
+  {
+    value: "sentosa",
+    label: "Sentosa",
+  },
+  {
+    value: "bukitTimah",
+    label: "Bukit Timah",
+  },
+  {
+    value: "woodlands",
+    label: "Woodlands",
+  },
+  {
+    value: "tiongBahru",
+    label: "Tiong Bahru",
+  },
+  {
+    value: "serangoon",
+    label: "Serangoon",
+  },
+  {
+    value: "clarkeQuay",
+    label: "Clarke Quay",
+  },
+  {
+    value: "choaChuKang",
+    label: "Choa Chu Kang",
+  },
+  {
+    value: "hollandVillage",
+    label: "Holland Village",
+  },
+  {
+    value: "chinatown",
+    label: "Chinatown",
+  },
+  {
+    value: "geylang",
+    label: "Geylang",
+  },
+  {
+    value: "tanjongPagar",
+    label: "Tanjong Pagar",
+  },
+  {
+    value: "bedok",
+    label: "Bedok",
+  },
+  {
+    value: "angMoKio",
+    label: "Ang Mo Kio",
+  },
+  {
+    value: "bishan",
+    label: "Bishan",
   },
 ];
 
 export const skillsOption = [
   {
-    value: "skill1",
-    label: "Skill 1",
+    value: "leadership",
+    label: "Leadership",
   },
   {
-    value: "skill2",
-    label: "Skill 2",
+    value: "problemSolving",
+    label: "Problem-Solving",
   },
   {
-    value: "skill3",
-    label: "Skill 3",
+    value: "organisationAndPlanning",
+    label: "Organisation & Planning",
+  },
+  {
+    value: "communication",
+    label: "Communication",
+  },
+  {
+    value: "relationshipBuilding",
+    label: "Relationship Building",
+  },
+  {
+    value: "mentoring",
+    label: "Mentoring",
+  },
+  {
+    value: "teamwork",
+    label: "Teamwork",
+  },
+  {
+    value: "timeManagement",
+    label: "Time Management",
   },
 ];
 
