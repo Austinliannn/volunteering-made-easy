@@ -25,13 +25,10 @@ mongoose
   });
 
 app.use(express.json());
-
 app.use(cors());
-
 app.use("/api", userRoutes);
 app.use("/api", authRoutes);
 app.use("/api", eventRoutes);
-
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: "Internal Server Error" });
