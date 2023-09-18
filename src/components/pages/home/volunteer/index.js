@@ -40,7 +40,7 @@ function VolunteerHome() {
       contentType: data.image.contentType,
       data: data.image.data,
     });
-    setSelectedModalData({...data, image: imageUrl});
+    setSelectedModalData({ ...data, image: imageUrl });
     setIsModalOpen(true);
   };
 
@@ -201,17 +201,17 @@ function VolunteerHome() {
 
       <div className={styles.container}>
         <div className={styles.carouselContainer}>
-          <div className={styles.cardDiv}>
-            {filteredEvents.length !== 0
-              ? filteredEvents.map((data, index) => (
+          {filteredEvents.length !== 0
+            ? filteredEvents.map((data, index) => (
+                <div className={styles.cardDiv}>
                   <CustomCard
                     key={index}
                     data={data}
                     onClick={() => showModal(data)}
                   />
-                ))
-              : "There are no events posted at the moment, Please refresh and try again later."}
-          </div>
+                </div>
+              ))
+            : "There are no events posted at the moment, Please refresh and try again later."}
 
           <CustomModal
             data={selectedModalData}
